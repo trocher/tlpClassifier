@@ -28,11 +28,15 @@ class Problem:
         return (self.whiteConfigurations == other.whiteConfigurations and self.blackConfigurations == other.blackConfigurations)
 
     def show(self):
-        print("====================================================================")
         print("W degree =", self.whiteDegree, "| B degree =", self.blackDegree, "| Alphabet :", self.alphabet())
         print("White Config : ", self.whiteConfigurations)
         print("Black Config : ", self.blackConfigurations)
-        
+        print(" ")
+    def writeInFile(self, io):
+        io.write("W degree = "+ str(self.whiteDegree) + " | B degree = " + str(self.blackDegree) + " | Alphabet : " + str(self.alphabet()) +"\n")
+        io.write("White Config : " + str(self.whiteConfigurations)+"\n")
+        io.write("Black Config : " + str(self.blackConfigurations)+"\n\n")
+
     def configurationAlphabet(self, configuration):
         alphabet = set()
         config = self.blackConfigurations if configuration == Configurations.Black else self.whiteConfigurations
@@ -71,3 +75,5 @@ class Problem:
     def getComplexity(self):
         if self.lowerbound == self.upperbound:
             return self.lowerbound
+        else :
+            return Complexity.Logarithmic
