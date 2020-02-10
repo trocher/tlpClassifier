@@ -2,7 +2,6 @@
 import itertools
 from Problem import Problem
 from Problem import Configurations
-
 from Complexity import Complexity
 from timeit import default_timer as timer
 
@@ -23,7 +22,6 @@ def edgeLabellings(degree):
 def powerset(that):
     return set(itertools.chain.from_iterable(itertools.combinations(that, r) for r in range(len(that)+1)))
 
-
 def problemsToFile(name, that):
     f= open(name,"w+")
     for elem in that:
@@ -32,10 +30,8 @@ def problemsToFile(name, that):
 
 whiteConfigurations = edgeLabellings(whiteDegree)
 whiteConstraints = powerset(whiteConfigurations)
-whiteConstraints.remove(())
 blackConfigurations = edgeLabellings(blackDegree)
 blackConstraints = powerset(blackConfigurations)
-blackConstraints.remove(())
 
 if DEBUG:
     print("Number of White Constraints :",len(whiteConstraints))
@@ -48,56 +44,49 @@ if whiteDegree == blackDegree:
     problemsTuple = set(itertools.combinations_with_replacement(whiteConstraints, 2))
 else :
     problemsTuple = set([(frozenset(a),frozenset(b)) for a in whiteConstraints for b in blackConstraints])
-problems = set([Problem(a,b) for (a,b) in problemsTuple])
+problems = set([Problem(a,b,whiteDegree,blackDegree) for (a,b) in problemsTuple])
 if DEBUG:
     print("Number of problems :", len(problems))
 
+
 def oneColoring():
-    return {Problem(set([tuple([l] * whiteDegree)]), set([tuple([l] * blackDegree)])) for l in labels}
+    return {Problem(set([tuple([l] * whiteDegree)]), set([tuple([l] * blackDegree)]), whiteDegree, blackDegree) for l in labels}
 
-def classifyConstant(problems):
+# Classify the problems of the given set such that the complexity of the ones on which the given predicate return true is set to the given complexity
+def classify(problems, predicate, complexity):
+    for problem in problems:
+        if predicate(problem):
+            problem.setComplexity(complexity)
+
+# A predicate similar to II
+# Check if the problem is insolvable : if the black and white constraints does not share any labels
+def unsolvableTest(problem):
+    return not problem.hasCommonLabels()
+
+# A predicate similar to III
+# Check if the black (resp. white) constraint does accept any edge labelling while the black (resp. black) constraint accept at least one configuration
+def constantTest(problem):
+    return problem.configurationSize(Configurations.White) == len(whiteConfigurations) and problem.configurationSize(Configurations.Black) != 0 or \
+           problem.configurationSize(Configurations.Black) == len(blackConfigurations) and problem.configurationSize(Configurations.White) != 0
+
+# A predicate similar to IV
+# Check if both the black and white constraints does both contain a configuration that label all edge in the same label
+def constantTest2(problem):
     oneColoringProblems = oneColoring()
-    for problem in problems:
-        if problem.configurationSize(Configurations.White) == len(whiteConfigurations) or problem.configurationSize(Configurations.Black) == len(blackConfigurations):
-            problem.setComplexity(Complexity.Constant)
-        for initialProblem in oneColoringProblems:
-            if (problem.isRelaxation(initialProblem)):
-                problem.setComplexity(Complexity.Constant)
+    for initialProblem in oneColoringProblems:
+        if (problem.isRelaxation(initialProblem)):
+            return True
+    return False
 
-start = timer()
-classifyConstant(problems)
-end = timer()
-constantProblems = {x for x in problems if x.getComplexity() == Complexity.Constant}
-if STORE:
-    start2 = timer()
-    problemsToFile("constantProblems.txt", constantProblems)
-    end2 = timer()
-if DEBUG:
-    print("Constant problems classified :",len(constantProblems))
-    print("Duration of the classification :", (end-start))
-    if STORE :
-        print("Duration of the writing to a file :", (end2-start2))
-        
+classify(problems, unsolvableTest, Complexity.Unsolvable)
+classify(problems, constantTest, Complexity.Constant)
+classify(problems, constantTest2, Complexity.Constant)
+
+for complexity in Complexity:
+    classifiedSubset = {x for x in problems if x.getComplexity() == complexity}
+    if DEBUG:
+        print(complexity.value+ " problems classified :",len(classifiedSubset))
+    if STORE:
+        problemsToFile("output/"+complexity.value + ".txt", classifiedSubset)
 
 
-def classifyUnsolvable(problems):
-    for problem in problems:
-        if not problem.hasCommonLabels():
-            problem.setComplexity(Complexity.Unsolvable)
-
-start = timer()
-classifyUnsolvable(problems)
-end = timer()
-unsolvableProblems = {x for x in problems if x.getComplexity() == Complexity.Unsolvable}
-if STORE:
-    start2 = timer()
-    problemsToFile("unsolvableProblems.txt", unsolvableProblems)
-    end2 = timer()
-if DEBUG:
-    print("Unsolvable problems classified :",len(unsolvableProblems))
-    print("Duration of the classification :", (end-start))
-    if STORE :
-        print("Duration of the writing to a file :", (end2-start2))
-        
-
-problemsToFile("other.txt", {x for x in problems if x.getComplexity() == Complexity.Logarithmic})

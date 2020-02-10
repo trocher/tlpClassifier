@@ -1,7 +1,8 @@
 from enum import Enum
 class Complexity(Enum):
-    Unsolvable = 0
-    Constant = 1
-    Iterated_Logarithmic = 2
-    Logarithmic = 3
-    Global = 4
+    Unsolvable = "unsolvable"
+    Constant = "constant"
+    Iterated_Logarithmic = "iterated_logarithmic"
+    Logarithmic = "logarithmic"
+    Global = "global"
+    Unclassified = "unclassified"
