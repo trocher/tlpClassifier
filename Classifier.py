@@ -10,11 +10,11 @@ DEBUG = True
 STORE = True
 #STORE = False
 
-labels = [1,2,3]
-
+#Degree of the white and black nodes
 whiteDegree = 3
 blackDegree = 3
 
+labels = set([1,2,3])
 ### Generate the Configurations
 def edgeLabellings(degree):
     return set(itertools.combinations_with_replacement(labels, degree))
