@@ -8,8 +8,8 @@ class Configurations(Enum):
 class Problem:
 
     # Creating a Problem
-    # whiteConfigurations is a set of all the configurations (tuples) allowed for the white nodes
-    # blackConfigurations is a set of all the configurations (tuples) allowed for the black nodes
+    # whiteConfigurations is a set of all the configurations (3-tuples) allowed for the white nodes
+    # blackConfigurations is a set of all the configurations (3-tuples) allowed for the black nodes
     def __init__(self, whiteConfigurations, blackConfigurations, whiteDegree, blackDegree):
         self.whiteConfigurations = frozenset(whiteConfigurations)
         self.blackConfigurations = frozenset(blackConfigurations)
@@ -25,6 +25,10 @@ class Problem:
     # Equality of problem.
     def __eq__(self,other):
         return (self.whiteConfigurations == other.whiteConfigurations and self.blackConfigurations == other.blackConfigurations)
+
+    def isEquivalent(self, that):
+        #TODO Implement the function
+        return
 
     # Print the main characteristics of the problem in the console
     def show(self):
@@ -46,7 +50,9 @@ class Problem:
         alphabet = set()
         config = self.blackConfigurations if configuration == Configurations.Black else self.whiteConfigurations
         for elem in config:
-            alphabet.update(elem)
+            for label in [1,2,3]:
+                if elem[label-1] != 0:
+                    alphabet.add(label)
         return alphabet
 
     # Return the size of the alphabet of the given configuration
@@ -64,6 +70,23 @@ class Problem:
 
     def hasCommonLabels(self):
         return len(self.configurationAlphabet(Configurations.White).intersection(self.configurationAlphabet(Configurations.Black))) != 0
+
+    def labelsSymetry(self):
+        res = set()
+        w,b = tuple(frozenset((a,b,c) for a,b,c in x) for x in [self.whiteConfigurations, self.blackConfigurations])
+        res.add(Problem(w,b,self.whiteDegree,self.blackDegree))
+        w,b = tuple(frozenset((a,c,b) for a,b,c in x) for x in [self.whiteConfigurations, self.blackConfigurations])
+        res.add(Problem(w,b,self.whiteDegree,self.blackDegree))
+        w,b = tuple(frozenset((b,a,c) for a,b,c in x) for x in [self.whiteConfigurations, self.blackConfigurations])
+        res.add(Problem(w,b,self.whiteDegree,self.blackDegree))
+        w,b = tuple(frozenset((b,c,a) for a,b,c in x) for x in [self.whiteConfigurations, self.blackConfigurations])
+        res.add(Problem(w,b,self.whiteDegree,self.blackDegree))
+        w,b = tuple(frozenset((c,a,b) for a,b,c in x) for x in [self.whiteConfigurations, self.blackConfigurations])
+        res.add(Problem(w,b,self.whiteDegree,self.blackDegree))
+        w,b = tuple(frozenset((c,b,a) for a,b,c in x) for x in [self.whiteConfigurations, self.blackConfigurations])
+        res.add(Problem(w,b,self.whiteDegree,self.blackDegree))
+        return res
+
 
     # Check if the current problem is a restriction of the given problem
     def isRestriction(self, other):

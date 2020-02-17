@@ -5,33 +5,33 @@ from Problem import Configurations
 from Complexity import Complexity
 from timeit import default_timer as timer
 
-DEBUG = True
-#DEBUG = False
-STORE = True
-#STORE = False
-
-#Degree of the white and black nodes
 whiteDegree = 3
 blackDegree = 3
 
+DEBUG = True
+#DEBUG = False
+STORE = False
+#STORE = False
+
 labels = set([1,2,3])
-### Generate the Configurations
-def edgeLabellings(degree):
-    return set(itertools.combinations_with_replacement(labels, degree))
+
+def edgeLabelling(degree):
+    return [(a,b,degree-a-b) for a in range(0,degree+1) for b in range(0,degree+1-a)]
 
 def powerset(that):
     return set(itertools.chain.from_iterable(itertools.combinations(that, r) for r in range(len(that)+1)))
 
-def problemsToFile(name, that):
-    f= open(name,"w+")
-    for elem in that:
-        elem.writeInFile(f)
-    f.close()
-
-whiteConfigurations = edgeLabellings(whiteDegree)
+whiteConfigurations = edgeLabelling(whiteDegree)
+blackConfigurations = edgeLabelling(blackDegree)
 whiteConstraints = powerset(whiteConfigurations)
-blackConfigurations = edgeLabellings(blackDegree)
 blackConstraints = powerset(blackConfigurations)
+
+if STORE:
+    with open('output/informations.txt', mode='w+', encoding='utf-8') as f:
+        f.write("White Configurations :\n")
+        f.write('\n'.join(str(elem) for elem in whiteConfigurations))
+        f.write("\nBlack Configurations :\n")
+        f.write('\n'.join(str(elem) for elem in blackConfigurations))
 
 if DEBUG:
     print("Number of White Constraints :",len(whiteConstraints))
@@ -48,9 +48,14 @@ problems = set([Problem(a,b,whiteDegree,blackDegree) for (a,b) in problemsTuple]
 if DEBUG:
     print("Number of problems :", len(problems))
 
-
 def oneColoring():
-    return {Problem(set([tuple([l] * whiteDegree)]), set([tuple([l] * blackDegree)]), whiteDegree, blackDegree) for l in labels}
+    return Problem({(3,0,0)}, {(3,0,0)}, whiteDegree, blackDegree).labelsSymetry()
+
+def problemsToFile(name, that):
+    f= open(name,"w+")
+    for elem in that:
+        elem.writeInFile(f)
+    f.close()
 
 # Classify the problems of the given set such that the complexity of the ones on which the given predicate return true is set to the given complexity
 def classify(problems, predicate, complexity):
@@ -88,5 +93,3 @@ for complexity in Complexity:
         print(complexity.value+ " problems classified :",len(classifiedSubset))
     if STORE:
         problemsToFile("output/"+complexity.value + ".txt", classifiedSubset)
-
-
