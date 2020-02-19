@@ -10,10 +10,19 @@ blackDegree = 3
 
 DEBUG = True
 #DEBUG = False
-STORE = False
+STORE = True
 #STORE = False
 
 labels = set([1,2,3])
+
+complexityName = {
+    Complexity.Unsolvable : "unsolvable",
+    Complexity.Constant : "constant",
+    Complexity.Iterated_Logarithmic : "iterated_logarithmic",
+    Complexity.Logarithmic : "logarithmic",
+    Complexity.Global : "global",
+    Complexity.Unclassified : "unclassified"
+    }
 
 def edgeLabelling(degree):
     return [(a,b,degree-a-b) for a in range(0,degree+1) for b in range(0,degree+1-a)]
@@ -39,26 +48,35 @@ if DEBUG:
 
 ### Construct the set of all possible problems
 
-# Delete the symetry between the black and white node in case they have the same degree
-if whiteDegree == blackDegree:
-    problemsTuple = set(itertools.combinations_with_replacement(whiteConstraints, 2))
-else :
-    problemsTuple = set([(frozenset(a),frozenset(b)) for a in whiteConstraints for b in blackConstraints])
+problemsTuple = set([(frozenset(a),frozenset(b)) for a in whiteConstraints for b in blackConstraints])
 problems = set([Problem(a,b,whiteDegree,blackDegree) for (a,b) in problemsTuple])
+
+numberOfProblems = len(problems)
 if DEBUG:
-    print("Number of problems :", len(problems))
+    print("Number of problems :", numberOfProblems)
 
+
+# Return the set of problem such that the white and black nodes have only edges labeled with a given color
 def oneColoring():
-    return Problem({(3,0,0)}, {(3,0,0)}, whiteDegree, blackDegree).labelsSymetry()
+    return Problem({(whiteDegree,0,0)}, {(blackDegree,0,0)}, whiteDegree, blackDegree).equivalentProblems()
 
+# Return the set of problems that define a maximal matching
+def maximalMatchings():
+    return Problem({(0,0,whiteDegree),(1, whiteDegree-1, 0)},\
+                    {(0,blackDegree,0)}.union({(1,a,blackDegree-1-a) for a in range(0,blackDegree)}),\
+                    whiteDegree, blackDegree).equivalentProblems()
+
+# Store a given set of problems in a file
+# name, a string, the name of the file
+# that, the set of problems
 def problemsToFile(name, that):
     f= open(name,"w+")
     for elem in that:
         elem.writeInFile(f)
     f.close()
 
-# Classify the problems of the given set such that the complexity of the ones on which the given predicate return true is set to the given complexity
-def classify(problems, predicate, complexity):
+# Classify the problems of the given set such that the complexity of the ones on which the given predicate return true is set to the given one
+def evaluate(problems, predicate, complexity):
     for problem in problems:
         if predicate(problem):
             problem.setComplexity(complexity)
@@ -70,26 +88,45 @@ def unsolvableTest(problem):
 
 # A predicate similar to III
 # Check if the black (resp. white) constraint does accept any edge labelling while the black (resp. black) constraint accept at least one configuration
-def constantTest(problem):
-    return problem.configurationSize(Configurations.White) == len(whiteConfigurations) and problem.configurationSize(Configurations.Black) != 0 or \
-           problem.configurationSize(Configurations.Black) == len(blackConfigurations) and problem.configurationSize(Configurations.White) != 0
+def constantTest3(problem):
+    return problem.configurationAlphabetSize(Configurations.White) == len(whiteConfigurations) and problem.configurationAlphabetSize(Configurations.Black) != 0 or \
+           problem.configurationAlphabetSize(Configurations.Black) == len(blackConfigurations) and problem.configurationAlphabetSize(Configurations.White) != 0
 
 # A predicate similar to IV
 # Check if both the black and white constraints does both contain a configuration that label all edge in the same label
-def constantTest2(problem):
+def constantTest4(problem):
     oneColoringProblems = oneColoring()
     for initialProblem in oneColoringProblems:
         if (problem.isRelaxation(initialProblem)):
             return True
     return False
 
-classify(problems, unsolvableTest, Complexity.Unsolvable)
-classify(problems, constantTest, Complexity.Constant)
-classify(problems, constantTest2, Complexity.Constant)
+# A predicate
+# Check if the white and black constraints contains a subset of configuration defining a maximal matching
+def iteratedLogarithmicTest(problem):
+    maximalMatchingProblems = maximalMatchings()
+    for initialProblem in maximalMatchingProblems:
+        if (problem.isRelaxation(initialProblem)):
+            return True
+    return False
 
-for complexity in Complexity:
-    classifiedSubset = {x for x in problems if x.getComplexity() == complexity}
-    if DEBUG:
-        print(complexity.value+ " problems classified :",len(classifiedSubset))
-    if STORE:
-        problemsToFile("output/"+complexity.value + ".txt", classifiedSubset)
+
+# Classify the given set of problems
+def classify(problems):
+    evaluate(problems, unsolvableTest, Complexity.Unsolvable)
+    evaluate(problems, constantTest3, Complexity.Constant)
+    evaluate(problems, constantTest4, Complexity.Constant)
+    evaluate(problems, iteratedLogarithmicTest, Complexity.Iterated_Logarithmic)
+    total = 0
+    for complexity in Complexity:
+        classifiedSubset = {x for x in problems if x.getComplexity() == complexity}
+        total += len(classifiedSubset)
+        if DEBUG:
+            print(complexityName.get(complexity)+ " problems :",len(classifiedSubset))
+        if STORE:
+            problemsToFile("output/"+complexityName.get(complexity) + ".txt", classifiedSubset)
+
+    if total != numberOfProblems:
+        print("Error, the sum of classified problems is not equal to the total number of problems")
+
+classify(problems)
