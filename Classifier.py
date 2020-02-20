@@ -5,7 +5,7 @@ from Problem import Configurations
 from Complexity import Complexity
 from timeit import default_timer as timer
 
-whiteDegree = 3
+whiteDegree = 2
 blackDegree = 3
 
 DEBUG = True
@@ -50,10 +50,10 @@ if DEBUG:
 
 problemsTuple = set([(frozenset(a),frozenset(b)) for a in whiteConstraints for b in blackConstraints])
 problems = set([Problem(a,b,whiteDegree,blackDegree) for (a,b) in problemsTuple])
-
 numberOfProblems = len(problems)
 if DEBUG:
     print("Number of problems :", numberOfProblems)
+
 
 
 # Return the set of problem such that the white and black nodes have only edges labeled with a given color

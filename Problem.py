@@ -86,7 +86,6 @@ class Problem:
         for w,b in problemSet : res.add(Problem(w,b,self.whiteDegree,self.blackDegree))
         return res
 
-
     # Check if the current problem is a restriction of the given problem
     def isRestriction(self, other):
         return self.whiteConfigurations.issubset(other.whiteConfigurations) and self.blackConfigurations.issubset(other.blackConfigurations)
