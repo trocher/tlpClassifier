@@ -20,7 +20,6 @@ class Problem:
         self.blackDegree = blackDegree
         self.lowerbound = Complexity.Constant
         self.upperbound = Complexity.Unsolvable
-        self.complexity = Complexity.Unclassified
 
     # The hash function for problems
     def __hash__(self):
@@ -94,6 +93,18 @@ class Problem:
     def isRelaxation(self, other):
         return other.isRestriction(self)
 
+    def isRelaxationOfAtLeast1(self, problemSet):
+        for elem in problemSet:
+            if self.isRelaxation(elem):
+                return True
+        return False
+
+    def isRestrictionOfAtLeast1(self, problemSet):
+        for elem in problemSet:
+            if self.isRestriction(elem):
+                return True
+        return False
+
     def setLowerBound(self,complexity):
         if self.upperbound.value < complexity.value:
             print("Error, trying to put a lowerbound (", complexity, ") bigger than the current upperbound (", self.upperbound , ")")
@@ -118,11 +129,12 @@ class Problem:
     # Set the complexity of the problem to the given complexity
     # complexity, a Complexity
     def setComplexity(self,complexity):
-        #self.setLowerBound(complexity)
-        #self.setUpperBound(complexity)
-        if complexity.value < self.complexity.value:
-            self.complexity = complexity
+        self.setLowerBound(complexity)
+        self.setUpperBound(complexity)
 
     # get the complexity of the problem
     def getComplexity(self):
-        return self.complexity
+        if (self.lowerbound == self.upperbound):
+            return self.lowerbound
+        else :
+            return Complexity.Unclassified

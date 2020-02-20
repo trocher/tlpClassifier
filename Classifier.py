@@ -75,48 +75,51 @@ def problemsToFile(name, that):
         elem.writeInFile(f)
     f.close()
 
-# Classify the problems of the given set such that the complexity of the ones on which the given predicate return true is set to the given one
-def evaluate(problems, predicate, complexity):
+# Classify the problems of the given set according to the given complexity
+def evaluate(problems, that, complexity):
+    print (len(that))
+    start = timer()
     for problem in problems:
-        if predicate(problem):
-            problem.setComplexity(complexity)
+        if problem.isRelaxationOfAtLeast1(that):
+            problem.setUpperBound(complexity)
+        if problem.isRestrictionOfAtLeast1(that):
+            problem.setLowerBound(complexity)
+    end = timer()
+    print(end-start)
 
-# A predicate similar to II
-# Check if the problem is insolvable : if the black and white constraints does not share any labels
-def unsolvableTest(problem):
-    return not problem.hasCommonLabels()
 
-# A predicate similar to III
-# Check if the black (resp. white) constraint does accept any edge labelling while the black (resp. black) constraint accept at least one configuration
-def constantTest3(problem):
-    return problem.configurationAlphabetSize(Configurations.White) == len(whiteConfigurations) and problem.configurationAlphabetSize(Configurations.Black) != 0 or \
-           problem.configurationAlphabetSize(Configurations.Black) == len(blackConfigurations) and problem.configurationAlphabetSize(Configurations.White) != 0
+# Similar to II
+# Return the set of unsolvabe problems for which the black and white constraints does not share any labels
+def unsolvableTest():
+    return {elem for elem in problems if not elem.hasCommonLabels()}
 
-# A predicate similar to IV
-# Check if both the black and white constraints does both contain a configuration that label all edge in the same label
-def constantTest4(problem):
-    oneColoringProblems = oneColoring()
-    for initialProblem in oneColoringProblems:
-        if (problem.isRelaxation(initialProblem)):
-            return True
-    return False
+# Similar to III
+# Return the set of problems for which the black (resp. white) constraint does accept any edge labelling while the black (resp. black) constraint accept at least one configuration
+def constantTest3():
+    return {elem for elem in problems if elem.configurationAlphabetSize(Configurations.White) == len(whiteConfigurations) and elem.configurationAlphabetSize(Configurations.Black) != 0 or \
+           elem.configurationAlphabetSize(Configurations.Black) == len(blackConfigurations) and elem.configurationAlphabetSize(Configurations.White) != 0}
 
-# A predicate
-# Check if the white and black constraints contains a subset of configuration defining a maximal matching
-def iteratedLogarithmicTest(problem):
-    maximalMatchingProblems = maximalMatchings()
-    for initialProblem in maximalMatchingProblems:
-        if (problem.isRelaxation(initialProblem)):
-            return True
-    return False
+# Similar to IV
+# Return the set of problems for which the black and white constraints does both contain a configuration that label all edge in the same label
+def constantTest4():
+    return oneColoring()
+
+# Return the set of problems for which the white and black constraints contains a subset of configuration defining a maximal matching
+#def iteratedLogarithmicTest():
+#    maximalMatchingProblems = maximalMatchings()
+#    for initialProblem in maximalMatchingProblems:
+#        if (problem.isRelaxation(initialProblem)):
+#            return True
+#    return False
+#
 
 
 # Classify the given set of problems
 def classify(problems):
-    evaluate(problems, unsolvableTest, Complexity.Unsolvable)
-    evaluate(problems, constantTest3, Complexity.Constant)
-    evaluate(problems, constantTest4, Complexity.Constant)
-    evaluate(problems, iteratedLogarithmicTest, Complexity.Iterated_Logarithmic)
+    evaluate(problems, constantTest4(), Complexity.Constant)
+    evaluate(problems, constantTest3(), Complexity.Constant)
+    evaluate(problems, unsolvableTest(), Complexity.Unsolvable)
+    #evaluate(problems, iteratedLogarithmicTest(), Complexity.Iterated_Logarithmic)
     total = 0
     for complexity in Complexity:
         classifiedSubset = {x for x in problems if x.getComplexity() == complexity}
