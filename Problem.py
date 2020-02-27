@@ -1,140 +1,134 @@
-from Complexity import Complexity
+from Complexity import Complexity, complexity_name
 from enum import Enum
 import itertools
+from ConstraintReductionAlgorithm import constraint_reduction
 
-class Configurations(Enum):
+class Constraints(Enum):
     White = 0
     Black = 1 
 
 class Problem:
 
-    # Creating a Problem
-    # whiteConfigurations is a set of all the configurations (3-tuples) allowed for the white nodes
-    # blackConfigurations is a set of all the configurations (3-tuples) allowed for the black nodes
+    # Create a Problem
+    # whiteConstraint is a set of all the configurations (3-tuples) allowed for the white nodes
+    # blackConstraint is a set of all the configurations (3-tuples) allowed for the black nodes
     # whiteDegree an int, the degree of the white nodes
     # blackDegree an int, the degree of the black nodes
-    def __init__(self, whiteConfigurations, blackConfigurations, whiteDegree, blackDegree):
-        self.whiteConfigurations = frozenset(whiteConfigurations)
-        self.blackConfigurations = frozenset(blackConfigurations)
-        self.whiteDegree = whiteDegree
-        self.blackDegree = blackDegree
-        self.lowerbound = Complexity.Constant
-        self.upperbound = Complexity.Unsolvable
+    def __init__(self, white_constraint, black_constraint, white_degree, black_degree):
+        self.white_constraint = frozenset(white_constraint)
+        self.black_constraint = frozenset(black_constraint)
+        self.white_degree = white_degree
+        self.black_degree = black_degree
+        self.lower_bound = Complexity.Constant
+        self.upper_bound = Complexity.Unsolvable
 
     # The hash function for problems
     def __hash__(self):
-        return hash((self.whiteConfigurations,self.blackConfigurations))
+        return hash((self.white_constraint,self.black_constraint))
 
     # Equality of problem.
     def __eq__(self,other):
-        return (self.whiteConfigurations == other.whiteConfigurations and self.blackConfigurations == other.blackConfigurations)
-
-    # Test if the problem is equivalent to a given problem
-    # that is the problem to be compared with
-    def isEquivalent(self, that):
-        return that in self.equivalentProblems()
+        return (self.white_constraint == other.white_constraint and self.black_constraint == other.black_constraint)
 
     # Print the main characteristics of the problem in the console
     def show(self):
-        print("W degree =", self.whiteDegree, "| B degree =", self.blackDegree, "| Alphabet :", self.alphabet())
-        print("White Config : ", self.whiteConfigurations)
-        print("Black Config : ", self.blackConfigurations)
+        print("W degree =", self.white_degree, "| B degree =", self.black_degree, "| Alphabet :", self.alphabet())
+        reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
+        print("White Constraint : ", self.white_constraint)
+        print("Black Constraint : ", self.black_constraint)
+        if(self.get_complexity==Complexity.Unclassified):
+                    print("Lower bound : ", complexity_name[self.lower_bound],"Upper bound : ", complexity_name[self.upper_bound])
         print(" ")
 
     # Write the main characteristics of the problem in a file
     # io is the stream where the problem should be written
-    def writeInFile(self, io):
-        io.write("W degree = "+ str(self.whiteDegree) + " | B degree = " + str(self.blackDegree) + " | Alphabet : " + str(self.alphabet()) +"\n")
-        io.write("White Config : " + str(self.whiteConfigurations)+"\n")
-        io.write("Black Config : " + str(self.blackConfigurations)+"\n\n")
+    def write_in_file(self, io):
+        io.write("W degree = "+ str(self.white_degree) + " | B degree = " + str(self.black_degree) + " | Alphabet : " + str(self.alphabet()) +"\n")
+        reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
+        io.write("White Constraint : " + str(reduced_white_constraint)+"\n")
+        io.write("Black Constraint : " + str(reduced_black_constraint)+"\n")
+        if(self.get_complexity==Complexity.Unclassified):
+            io.write("Lower bound : " + complexity_name[self.lower_bound] + " | Upper bound : " + complexity_name[self.upper_bound] + "\n")
+        io.write("\n")
 
-    # Return the alphabet of the given configuration
-    # configuration is either Configurations.Black or Configurations.Black
-    def configurationAlphabet(self, configuration):
+    # Return the alphabet of the given constraint
+    # constraint is either Constraints.Black or Constraints.Black
+    def constraint_alphabet(self, constraint):
         alphabet = set()
-        config = self.blackConfigurations if configuration == Configurations.Black else self.whiteConfigurations
+        config = self.black_constraint if constraint == Constraints.Black else self.white_constraint
         for elem in config:
             for label in [1,2,3]:
                 if elem[label-1] != 0:
                     alphabet.add(label)
         return alphabet
 
-    # Return the size of the alphabet of the given configuration
-    # configuration is either Configurations.Black or Configurations.Black
-    def configurationAlphabetSize(self, configuration):
-        return len(self.blackConfigurations if configuration == Configurations.Black else self.whiteConfigurations)
+    # Return the size of the alphabet of the given constraint
+    # constraint is either Constraints.Black or Constraints.Black
+    def constraint_size(self, constraint):
+        return len(self.black_constraint if constraint == Constraints.Black else self.white_constraint)
 
     # Return the the alphabet of the problem
     def alphabet(self):
-        return self.configurationAlphabet(Configurations.White).union(self.configurationAlphabet(Configurations.Black))
+        return self.constraint_alphabet(Constraints.White).union(self.constraint_alphabet(Constraints.Black))
 
     # Return the the alphabet size of the problem
-    def alphabetSize(self):
+    def alphabet_size(self):
         return len(self.alphabet())
 
-    # Check if the black configurations and the white configurations share some labels
-    def hasCommonLabels(self):
-        return len(self.configurationAlphabet(Configurations.White).intersection(self.configurationAlphabet(Configurations.Black))) != 0
-
-    # Compute the set of equivalents problems of the problem
-    def equivalentProblems(self):
-        res = set()
-        problemSet = {tuple(frozenset( (t[a],t[b],t[c]) for t in x) for x in [self.whiteConfigurations, self.blackConfigurations]) for a,b,c in itertools.permutations([0,1,2])}
-        if self.blackDegree == self.whiteDegree:
-            problemSet.union({(b,w) for w,b in problemSet})
-        for w,b in problemSet : res.add(Problem(w,b,self.whiteDegree,self.blackDegree))
-        return res
-
     # Check if the current problem is a restriction of the given problem
-    def isRestriction(self, other):
-        return self.whiteConfigurations.issubset(other.whiteConfigurations) and self.blackConfigurations.issubset(other.blackConfigurations)
+    def is_restriction(self, other):
+        return self.white_constraint.issubset(other.white_constraint) and self.black_constraint.issubset(other.black_constraint)
    
     # Check if the current problem is a relaxation of the given problem
-    def isRelaxation(self, other):
-        return other.isRestriction(self)
+    def is_relaxation(self, other):
+        return other.is_restriction(self)
 
-    def isRelaxationOfAtLeast1(self, problemSet):
+    def is_relaxation_of_at_least_1(self, problemSet):
         for elem in problemSet:
-            if self.isRelaxation(elem):
+            if self.is_relaxation(elem):
                 return True
         return False
 
-    def isRestrictionOfAtLeast1(self, problemSet):
+    def is_restriction_of_at_least_1(self, problemSet):
         for elem in problemSet:
-            if self.isRestriction(elem):
+            if self.is_restriction(elem):
                 return True
         return False
-
-    def setLowerBound(self,complexity):
-        if self.upperbound.value < complexity.value:
-            print("Error, trying to put a lowerbound (", complexity, ") bigger than the current upperbound (", self.upperbound , ")")
+    
+    # Set a lower bound for the complexity of the problem
+    def set_lower_bound(self,complexity):
+            # Inputs:
+        #       - complexity : the new lower bound to the problem
+        if self.upper_bound.value < complexity.value:
+            print("Error, trying to put a lower bound (", complexity, ") bigger than the current upper bound (", self.upper_bound , ")")
             self.show()
             return
-        if self.lowerbound.value < complexity.value:
-            self.lowerbound = complexity
+        if self.lower_bound.value < complexity.value:
+            self.lower_bound = complexity
             if complexity == Complexity.Unsolvable:
-                self.setUpperBound(Complexity.Unsolvable)
+                self.set_upper_bound(Complexity.Unsolvable)
 
-    def setUpperBound(self,complexity):
-        if self.lowerbound.value > complexity.value:
-            print("Error, trying to put a upperbound (", complexity, ") lower than the current lowerbound (", self.lowerbound , ")")
+    # Set an upper bound for the complexity of the problem
+    def set_upper_bound(self,complexity):
+        # Inputs:
+        #       - complexity : the new upper bound for the problem
+        if self.lower_bound.value > complexity.value:
+            print("Error, trying to put a upper bound (", complexity, ") lower than the current lower bound (", self.lower_bound , ")")
             self.show()
-            return
-        if self.upperbound.value > complexity.value:
-            self.upperbound = complexity
+        if self.upper_bound.value > complexity.value:
+            self.upper_bound = complexity
             if complexity == Complexity.Constant:
-                self.setLowerBound(Complexity.Constant)
+                self.set_lower_bound(Complexity.Constant)
 
 
     # Set the complexity of the problem to the given complexity
     # complexity, a Complexity
-    def setComplexity(self,complexity):
-        self.setLowerBound(complexity)
-        self.setUpperBound(complexity)
+    def set_complexity(self,complexity):
+        # Inputs:
+        #       - complexity : the new lower bound for the problem
+        self.set_lower_bound(complexity)
+        self.set_upper_bound(complexity)
 
-    # get the complexity of the problem
-    def getComplexity(self):
-        if (self.lowerbound == self.upperbound):
-            return self.lowerbound
-        else :
-            return Complexity.Unclassified
+    # Get the complexity of the problem
+    def get_complexity(self):
+        return self.lower_bound if (self.lower_bound == self.upper_bound) else Complexity.Unclassified

@@ -1,135 +1,93 @@
 #!/usr/bin/python3
-import itertools
 from Problem import Problem
-from Problem import Configurations
-from Complexity import Complexity
+from Problem import Constraints
+from Complexity import Complexity,complexity_name
 from timeit import default_timer as timer
+import pickle
+import Tools
+from ConstraintReductionAlgorithm import constraint_reduction
+from FileHelp import data_name, problems_to_file,add_degree_suffix
 
-whiteDegree = 2
-blackDegree = 3
+WHITE_DEGREE = 3
+BLACK_DEGREE = 3
+LABELS = frozenset([1,2,3])
 
 DEBUG = True
 #DEBUG = False
 STORE = True
 #STORE = False
 
-labels = set([1,2,3])
-
-complexityName = {
-    Complexity.Unsolvable : "unsolvable",
-    Complexity.Constant : "constant",
-    Complexity.Iterated_Logarithmic : "iterated_logarithmic",
-    Complexity.Logarithmic : "logarithmic",
-    Complexity.Global : "global",
-    Complexity.Unclassified : "unclassified"
-    }
-
-def edgeLabelling(degree):
-    return [(a,b,degree-a-b) for a in range(0,degree+1) for b in range(0,degree+1-a)]
-
-def powerset(that):
-    return set(itertools.chain.from_iterable(itertools.combinations(that, r) for r in range(len(that)+1)))
-
-whiteConfigurations = edgeLabelling(whiteDegree)
-blackConfigurations = edgeLabelling(blackDegree)
-whiteConstraints = powerset(whiteConfigurations)
-blackConstraints = powerset(blackConfigurations)
-
-if STORE:
-    with open('output/informations.txt', mode='w+', encoding='utf-8') as f:
-        f.write("White Configurations :\n")
-        f.write('\n'.join(str(elem) for elem in whiteConfigurations))
-        f.write("\nBlack Configurations :\n")
-        f.write('\n'.join(str(elem) for elem in blackConfigurations))
-
-if DEBUG:
-    print("Number of White Constraints :",len(whiteConstraints))
-    print("Number of Black Constraints :",len(blackConstraints))
-
-### Construct the set of all possible problems
-
-problemsTuple = set([(frozenset(a),frozenset(b)) for a in whiteConstraints for b in blackConstraints])
-problems = set([Problem(a,b,whiteDegree,blackDegree) for (a,b) in problemsTuple])
-numberOfProblems = len(problems)
-if DEBUG:
-    print("Number of problems :", numberOfProblems)
-
-
-
-# Return the set of problem such that the white and black nodes have only edges labeled with a given color
-def oneColoring():
-    return Problem({(whiteDegree,0,0)}, {(blackDegree,0,0)}, whiteDegree, blackDegree).equivalentProblems()
-
-# Return the set of problems that define a maximal matching
-def maximalMatchings():
-    return Problem({(0,0,whiteDegree),(1, whiteDegree-1, 0)},\
-                    {(0,blackDegree,0)}.union({(1,a,blackDegree-1-a) for a in range(0,blackDegree)}),\
-                    whiteDegree, blackDegree).equivalentProblems()
-
-# Store a given set of problems in a file
-# name, a string, the name of the file
-# that, the set of problems
-def problemsToFile(name, that):
-    f= open(name,"w+")
-    for elem in that:
-        elem.writeInFile(f)
-    f.close()
+def import_data_set(white_degree, black_degree):
+    with open(data_name(WHITE_DEGREE,BLACK_DEGREE), 'rb') as problem_file:
+        problems = pickle.load(problem_file)
+    return problems
 
 # Classify the problems of the given set according to the given complexity
 def evaluate(problems, that, complexity):
-    print (len(that))
     start = timer()
-    for problem in problems:
-        if problem.isRelaxationOfAtLeast1(that):
-            problem.setUpperBound(complexity)
-        if problem.isRestrictionOfAtLeast1(that):
-            problem.setLowerBound(complexity)
+    relaxations = 0
+    restrictions = 0
+    for problem in that:
+        problem.set_complexity(complexity)
+    for problem in problems.difference(that):
+        if problem.is_relaxation_of_at_least_1(that):
+            relaxations +=1
+            problem.set_upper_bound(complexity)
+        if problem.is_restriction_of_at_least_1(that):
+            restrictions +=1
+            problem.set_lower_bound(complexity)
     end = timer()
-    print(end-start)
 
+    print("Classifying problems of complexity :",complexity_name[complexity])
+    print (len(that), "problems founds")
+    print (relaxations, "relaxations founds")
+    print (restrictions, "restrictions founds")
+    print("Finished in time ", end-start, "\n")
 
-# Similar to II
-# Return the set of unsolvabe problems for which the black and white constraints does not share any labels
-def unsolvableTest():
-    return {elem for elem in problems if not elem.hasCommonLabels()}
-
-# Similar to III
-# Return the set of problems for which the black (resp. white) constraint does accept any edge labelling while the black (resp. black) constraint accept at least one configuration
-def constantTest3():
-    return {elem for elem in problems if elem.configurationAlphabetSize(Configurations.White) == len(whiteConfigurations) and elem.configurationAlphabetSize(Configurations.Black) != 0 or \
-           elem.configurationAlphabetSize(Configurations.Black) == len(blackConfigurations) and elem.configurationAlphabetSize(Configurations.White) != 0}
-
-# Similar to IV
-# Return the set of problems for which the black and white constraints does both contain a configuration that label all edge in the same label
-def constantTest4():
-    return oneColoring()
-
-# Return the set of problems for which the white and black constraints contains a subset of configuration defining a maximal matching
-#def iteratedLogarithmicTest():
-#    maximalMatchingProblems = maximalMatchings()
-#    for initialProblem in maximalMatchingProblems:
-#        if (problem.isRelaxation(initialProblem)):
-#            return True
-#    return False
-#
-
+# Return the subset of unsolvable problems
+def unsolvable_test(problems):
+    unsolvable_set = set()
+    for elem in problems:
+        white_constraint, black_constraint = constraint_reduction(elem)
+        if(len(white_constraint)==0 or len(black_constraint)==0):
+            unsolvable_set.add(elem)
+    return unsolvable_set
+    
+# Return the subset of constant problems
+def constant_test(problems):
+    res = set()
+    for i in [1,2,3]:
+        alphabet_i_subsets = Tools.subsets_of_size_n(LABELS,i)
+        constraint_white_max = Tools.edge_n_labelling_len(WHITE_DEGREE,i)
+        constraint_black_max = Tools.edge_n_labelling_len(BLACK_DEGREE,i)
+        for elem in problems:
+            for alphabet_subset in alphabet_i_subsets:
+                if(elem.constraint_alphabet(Constraints.White) == alphabet_subset and\
+                elem.constraint_size(Constraints.White) == constraint_white_max and \
+                elem.constraint_alphabet(Constraints.Black)==alphabet_subset or\
+                elem.constraint_alphabet(Constraints.Black) == alphabet_subset and\
+                elem.constraint_size(Constraints.Black) == constraint_black_max and \
+                elem.constraint_alphabet(Constraints.White)==alphabet_subset):
+                    res.add(elem)
+    return res
 
 # Classify the given set of problems
 def classify(problems):
-    evaluate(problems, constantTest4(), Complexity.Constant)
-    evaluate(problems, constantTest3(), Complexity.Constant)
-    evaluate(problems, unsolvableTest(), Complexity.Unsolvable)
-    #evaluate(problems, iteratedLogarithmicTest(), Complexity.Iterated_Logarithmic)
+    print(len(problems), "problems in the dataset")
+    print("degrees : (",WHITE_DEGREE,BLACK_DEGREE,")\n")
+
+    evaluate(problems, unsolvable_test(problems), Complexity.Unsolvable)
+    evaluate(problems, constant_test(problems), Complexity.Constant)
     total = 0
     for complexity in Complexity:
-        classifiedSubset = {x for x in problems if x.getComplexity() == complexity}
+        classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
         total += len(classifiedSubset)
         if DEBUG:
-            print(complexityName.get(complexity)+ " problems :",len(classifiedSubset))
+            print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
         if STORE:
-            problemsToFile("output/"+complexityName.get(complexity) + ".txt", classifiedSubset)
+            problems_to_file("output/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
 
-    if total != numberOfProblems:
+    if total != len(problems):
         print("Error, the sum of classified problems is not equal to the total number of problems")
-
+problems = import_data_set(WHITE_DEGREE,BLACK_DEGREE)
 classify(problems)
