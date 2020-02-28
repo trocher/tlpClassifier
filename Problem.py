@@ -2,7 +2,7 @@ from Complexity import Complexity, complexity_name
 from enum import Enum
 import itertools
 from ConstraintReductionAlgorithm import constraint_reduction
-
+import ConstraintReductionAlgorithm
 class Constraints(Enum):
     White = 0
     Black = 1 
@@ -34,28 +34,29 @@ class Problem:
     def show(self):
         print("W degree =", self.white_degree, "| B degree =", self.black_degree, "| Alphabet :", self.alphabet())
         reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
+        print("White Constraint : ", self.white_constraint)
+        print("Black Constraint : ", self.black_constraint)
         if(self.get_complexity()==Complexity.Unclassified):
             reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
-            print("White Constraint : ", self.reduced_white_constraint)
-            print("Black Constraint : ", self.reduced_black_constraint)
+            print("Reduced alphabet : ", self.reduced_alphabet())
+            print("Reduced White Constraint : ", self.reduced_white_constraint)
+            print("Reduced Black Constraint : ", self.reduced_black_constraint)
             print("Lower bound : ", complexity_name[self.lower_bound],"Upper bound : ", complexity_name[self.upper_bound])
-        else:
-            print("White Constraint : ", self.white_constraint)
-            print("Black Constraint : ", self.black_constraint)
         print(" ")
 
     # Write the main characteristics of the problem in a file
     # io is the stream where the problem should be written
     def write_in_file(self, io):
         io.write("W degree = "+ str(self.white_degree) + " | B degree = " + str(self.black_degree) + " | Alphabet : " + str(self.alphabet()) +"\n")
+        io.write("White Constraint : " + str(set(self.white_constraint))+"\n")
+        io.write("Black Constraint : " + str(set(self.black_constraint))+"\n")
         if(self.get_complexity()==Complexity.Unclassified):
+            io.write("\n")
             reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
-            io.write("White Constraint : " + str(reduced_white_constraint)+"\n")
-            io.write("Black Constraint : " + str(reduced_black_constraint)+"\n")
+            io.write("Reduced alphabet : " + str(self.reduced_alphabet())+"\n")
+            io.write("Reduced white Constraint : " + str(reduced_white_constraint)+"\n")
+            io.write("Reduced black Constraint : " + str(reduced_black_constraint)+"\n")
             io.write("Lower bound : " + complexity_name[self.lower_bound] + " | Upper bound : " + complexity_name[self.upper_bound] + "\n")
-        else:
-            io.write("White Constraint : " + str(reduced_white_constraint)+"\n")
-            io.write("Black Constraint : " + str(reduced_black_constraint)+"\n")
         io.write("\n")
 
     # Return the alphabet of the given constraint
@@ -67,8 +68,11 @@ class Problem:
             for label in [1,2,3]:
                 if elem[label-1] != 0:
                     alphabet.add(label)
-        return alphabet
+        return alphabet 
 
+    def reduced_alphabet(self):
+        reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
+        return ConstraintReductionAlgorithm.constraint_alphabet(reduced_black_constraint).union(ConstraintReductionAlgorithm.constraint_alphabet(reduced_white_constraint))
     # Return the size of the alphabet of the given constraint
     # constraint is either Constraints.Black or Constraints.Black
     def constraint_size(self, constraint):

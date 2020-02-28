@@ -8,7 +8,7 @@ import Tools
 from ConstraintReductionAlgorithm import constraint_reduction
 from FileHelp import data_name, problems_to_file,add_degree_suffix
 
-WHITE_DEGREE = 3
+WHITE_DEGREE = 2
 BLACK_DEGREE = 3
 LABELS = frozenset([1,2,3])
 
@@ -84,8 +84,15 @@ def classify(problems):
         total += len(classifiedSubset)
         if DEBUG:
             print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
+            if complexity == Complexity.Unclassified:
+                subset_3_labels = {x for x in classifiedSubset if len(x.reduced_alphabet()) == 3}
+                subset_2_labels = {x for x in classifiedSubset if len(x.reduced_alphabet()) == 2}
+                print("including",len(subset_2_labels), "2_labelling problems")
         if STORE:
             problems_to_file("output/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
+            if complexity == Complexity.Unclassified:
+                subset_3_labels = {x for x in classifiedSubset if len(x.reduced_alphabet()) == 3}
+                problems_to_file("output/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + complexity_name.get(complexity) + "3_labels.txt", subset_3_labels)
 
     if total != len(problems):
         print("Error, the sum of classified problems is not equal to the total number of problems")
