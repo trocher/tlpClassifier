@@ -1,4 +1,3 @@
-
 # Return the alphabet of the given constraint (a set of 3-tuple)
 def constraint_alphabet(constraint):
     alphabet = set()

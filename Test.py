@@ -10,16 +10,16 @@ class TestProblem(unittest.TestCase):
         self.assertEqual(problem1, problem2)
 
     def test_alphabet(self):
-        problem1 = Problem(set([(1,2,0),(2,1,0)]), set([(1,2,0),(3,0,0)]), 3, 3)
-        self.assertEqual(set([1,2]), problem1.alphabet())
-        problem2 = Problem(set([(1,1,1),(2,1,0)]), set([(1,2,0),(3,0,0)]), 3, 3)
-        self.assertEqual(set([1,2,3]), problem2.alphabet())
-        problem3 = Problem(set([(3,0,0)]), set([(3,0,0)]), 3, 3)
-        self.assertEqual(set([1]), problem3.alphabet())
+        problem1 = Problem(frozenset([(1,2,0),(2,1,0)]), frozenset([(1,2,0),(3,0,0)]), 3, 3)
+        self.assertEqual(frozenset([1,2]), problem1.alphabet())
+        problem2 = Problem(frozenset([(1,1,1),(2,1,0)]), frozenset([(1,2,0),(3,0,0)]), 3, 3)
+        self.assertEqual(frozenset([1,2,3]), problem2.alphabet())
+        problem3 = Problem(frozenset([(3,0,0)]), frozenset([(3,0,0)]), 3, 3)
+        self.assertEqual(frozenset([1]), problem3.alphabet())
 
     def test_hasCommonLabels(self):
-        problem1 = Problem(set([(1,2,0),(2,1,0)]), set([(1,2,0),(3,0,0)]), 3, 3)
-        problem2 = Problem(set([(0,3,0)]), set([(3,0,0)]), 3, 3)
+        problem1 = Problem(frozenset([(1,2,0),(2,1,0)]), frozenset([(1,2,0),(3,0,0)]), 3, 3)
+        problem2 = Problem(frozenset([(0,3,0)]), frozenset([(3,0,0)]), 3, 3)
         self.assertTrue(problem1.has_common_labels())
         self.assertFalse(problem2.has_common_labels())
 

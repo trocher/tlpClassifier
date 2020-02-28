@@ -3,3 +3,4 @@ __pycache__/
 tlp_classifier.code-workspace
 t.py
 .vscode/
+.DS_Store

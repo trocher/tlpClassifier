@@ -1,9 +1,10 @@
 import itertools
 
+# Return the list of possible 3-labellings of node with a given degre
 def edge_3_labelling(degree):
     return [(a,b,degree-a-b) for a in range(0,degree+1) for b in range(0,degree+1-a)]
 
-
+# Return the number of possible labellings of node with a given degre and a given number of labels
 def edge_n_labelling_len(degree, n):
     if n == 1: return 1
     if n == 2: return len([(a,degree-a) for a in range(0,degree+1)])

@@ -34,21 +34,28 @@ class Problem:
     def show(self):
         print("W degree =", self.white_degree, "| B degree =", self.black_degree, "| Alphabet :", self.alphabet())
         reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
-        print("White Constraint : ", self.white_constraint)
-        print("Black Constraint : ", self.black_constraint)
-        if(self.get_complexity==Complexity.Unclassified):
-                    print("Lower bound : ", complexity_name[self.lower_bound],"Upper bound : ", complexity_name[self.upper_bound])
+        if(self.get_complexity()==Complexity.Unclassified):
+            reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
+            print("White Constraint : ", self.reduced_white_constraint)
+            print("Black Constraint : ", self.reduced_black_constraint)
+            print("Lower bound : ", complexity_name[self.lower_bound],"Upper bound : ", complexity_name[self.upper_bound])
+        else:
+            print("White Constraint : ", self.white_constraint)
+            print("Black Constraint : ", self.black_constraint)
         print(" ")
 
     # Write the main characteristics of the problem in a file
     # io is the stream where the problem should be written
     def write_in_file(self, io):
         io.write("W degree = "+ str(self.white_degree) + " | B degree = " + str(self.black_degree) + " | Alphabet : " + str(self.alphabet()) +"\n")
-        reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
-        io.write("White Constraint : " + str(reduced_white_constraint)+"\n")
-        io.write("Black Constraint : " + str(reduced_black_constraint)+"\n")
-        if(self.get_complexity==Complexity.Unclassified):
+        if(self.get_complexity()==Complexity.Unclassified):
+            reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
+            io.write("White Constraint : " + str(reduced_white_constraint)+"\n")
+            io.write("Black Constraint : " + str(reduced_black_constraint)+"\n")
             io.write("Lower bound : " + complexity_name[self.lower_bound] + " | Upper bound : " + complexity_name[self.upper_bound] + "\n")
+        else:
+            io.write("White Constraint : " + str(reduced_white_constraint)+"\n")
+            io.write("Black Constraint : " + str(reduced_black_constraint)+"\n")
         io.write("\n")
 
     # Return the alphabet of the given constraint
