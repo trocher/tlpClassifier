@@ -16,9 +16,7 @@ def labels_in_1_constraint(white_constraint,black_constraint):
     return (constraint_alphabet(white_constraint).union(constraint_alphabet(black_constraint))).difference(constraint_alphabet(white_constraint).intersection(constraint_alphabet(black_constraint)))
 
 # Remove all the useless configurations from both white and black constraints
-def constraint_reduction(problem):
-    white_constraint = problem.white_constraint
-    black_constraint = problem.black_constraint
+def constraint_reduction(white_constraint, black_constraint):
     tmp = set([1,2,3])
     while(len(tmp) != 0 and len(white_constraint)!=0 and len(black_constraint)!=0):
         tmp = labels_in_1_constraint(white_constraint,black_constraint)

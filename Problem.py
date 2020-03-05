@@ -17,6 +17,7 @@ class Problem:
     def __init__(self, white_constraint, black_constraint, white_degree, black_degree):
         self.white_constraint = frozenset(white_constraint)
         self.black_constraint = frozenset(black_constraint)
+        self.reduced_white_constraint, self.reduced_black_constraint = constraint_reduction(white_constraint,black_constraint)
         self.white_degree = white_degree
         self.black_degree = black_degree
         self.lower_bound = Complexity.Constant
@@ -33,14 +34,12 @@ class Problem:
     # Print the main characteristics of the problem in the console
     def show(self):
         print("W degree =", self.white_degree, "| B degree =", self.black_degree, "| Alphabet :", self.alphabet())
-        reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
         print("White Constraint : ", self.white_constraint)
         print("Black Constraint : ", self.black_constraint)
+        print("Reduced alphabet : ", self.reduced_alphabet())
+        print("Reduced White Constraint : ", self.reduced_white_constraint)
+        print("Reduced Black Constraint : ", self.reduced_black_constraint)
         if(self.get_complexity()==Complexity.Unclassified):
-            reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
-            print("Reduced alphabet : ", self.reduced_alphabet())
-            print("Reduced White Constraint : ", self.reduced_white_constraint)
-            print("Reduced Black Constraint : ", self.reduced_black_constraint)
             print("Lower bound : ", complexity_name[self.lower_bound],"Upper bound : ", complexity_name[self.upper_bound])
         print(" ")
 
@@ -50,12 +49,10 @@ class Problem:
         io.write("W degree = "+ str(self.white_degree) + " | B degree = " + str(self.black_degree) + " | Alphabet : " + str(self.alphabet()) +"\n")
         io.write("White Constraint : " + str(set(self.white_constraint))+"\n")
         io.write("Black Constraint : " + str(set(self.black_constraint))+"\n")
+        io.write("Reduced alphabet : " + str(self.reduced_alphabet())+"\n")
+        io.write("Reduced white Constraint : " + str(self.reduced_white_constraint)+"\n")
+        io.write("Reduced black Constraint : " + str(self.reduced_black_constraint)+"\n")
         if(self.get_complexity()==Complexity.Unclassified):
-            io.write("\n")
-            reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
-            io.write("Reduced alphabet : " + str(self.reduced_alphabet())+"\n")
-            io.write("Reduced white Constraint : " + str(reduced_white_constraint)+"\n")
-            io.write("Reduced black Constraint : " + str(reduced_black_constraint)+"\n")
             io.write("Lower bound : " + complexity_name[self.lower_bound] + " | Upper bound : " + complexity_name[self.upper_bound] + "\n")
         io.write("\n")
 
@@ -71,8 +68,8 @@ class Problem:
         return alphabet 
 
     def reduced_alphabet(self):
-        reduced_white_constraint, reduced_black_constraint = constraint_reduction(self)
-        return ConstraintReductionAlgorithm.constraint_alphabet(reduced_black_constraint).union(ConstraintReductionAlgorithm.constraint_alphabet(reduced_white_constraint))
+        return ConstraintReductionAlgorithm.constraint_alphabet(self.reduced_black_constraint).union(ConstraintReductionAlgorithm.constraint_alphabet(self.reduced_white_constraint))
+    
     # Return the size of the alphabet of the given constraint
     # constraint is either Constraints.Black or Constraints.Black
     def constraint_size(self, constraint):
@@ -94,7 +91,7 @@ class Problem:
     def is_relaxation(self, other):
         return other.is_restriction(self)
 
-    def is_relaxation_of_at_least_1(self, problemSet):
+    def is_relaxation_of_at_least_1(self, problemSet):   
         for elem in problemSet:
             if self.is_relaxation(elem):
                 return True

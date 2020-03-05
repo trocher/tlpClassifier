@@ -6,7 +6,7 @@ from FileHelp import data_name
 
 
 WHITE_DEGREE = 2
-BLACK_DEGREE = 4
+BLACK_DEGREE = 3
 LABELS = set([1,2,3])
 
 DEBUG = True
