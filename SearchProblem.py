@@ -12,11 +12,10 @@ def search(alpha_problem):
     #problem.show()
     for elem in problems:
         if problem == elem:
-            elem.show()
-
+            print(elem)
 
 white_constraint = {'AA','BA'}
-black_constraint = {'BCC','ACC','AAB'}
+black_constraint = {'BCC','ACC','AB'}
 white_degree = 2
 black_degree = 3
 alpha_problem = (white_constraint,black_constraint,white_degree,black_degree)

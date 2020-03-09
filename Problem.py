@@ -28,28 +28,23 @@ class Problem:
     # Equality of problem.
     def __eq__(self,other):
         return (self.white_constraint == other.white_constraint and self.black_constraint == other.black_constraint)
-
     # Print the main characteristics of the problem in the console
-    def show(self):
-        print("W degree =", self.white_degree, "| B degree =", self.black_degree, "| Alphabet :", self.alphabet())
-        print("White Constraint : ", self.white_constraint)
-        print("Black Constraint : ", self.black_constraint)
+    def __repr__(self):
+        def mapping_function(configuration):
+            return "A"*configuration[2]+"B"*configuration[1]+"C"*configuration[0]
+        w = "White Constraint : " + ", ".join(map(mapping_function,self.white_constraint))
+        b = "Black Constraint : " + ", ".join(map(mapping_function,self.black_constraint))
+        res = w + "\n" + b + "\n"
         if(self.get_complexity()==Complexity.Unclassified):
-            print("Lower bound : ", complexity_name[self.lower_bound],"Upper bound : ", complexity_name[self.upper_bound])
+            return  res + "Lower bound : "+ complexity_name[self.lower_bound] + "\n" + "Upper bound : " + complexity_name[self.upper_bound] + "\n"
         else :
-            print("Complexity : ", complexity_name[self.lower_bound])
-        print(" ")
-
+            return res + "Complexity : "+ complexity_name[self.lower_bound] + "\n"
+    # Print the main characteristics of the problem in the console
 
     # Write the main characteristics of the problem in a file
     # io is the stream where the problem should be written
     def write_in_file(self, io):
-        io.write("W degree = "+ str(self.white_degree) + " | B degree = " + str(self.black_degree) + " | Alphabet : " + str(self.alphabet()) +"\n")
-        io.write("White Constraint : " + str(set(self.white_constraint))+"\n")
-        io.write("Black Constraint : " + str(set(self.black_constraint))+"\n")
-        if(self.get_complexity()==Complexity.Unclassified):
-            io.write("Lower bound : " + complexity_name[self.lower_bound] + " | Upper bound : " + complexity_name[self.upper_bound] + "\n")
-        io.write("\n")
+        io.write(self.__repr__()+"\n")
 
     # Return the alphabet of the given constraint
     # constraint is either Constraints.Black or Constraints.Black
@@ -101,7 +96,7 @@ class Problem:
         #       - complexity : the new lower bound to the problem
         if self.upper_bound.value < complexity.value:
             print("Error, trying to put a lower bound (", complexity, ") bigger than the current upper bound (", self.upper_bound , ")")
-            self.show()
+            print(self)
             return
         if self.lower_bound.value < complexity.value:
             self.lower_bound = complexity
@@ -114,7 +109,7 @@ class Problem:
         #       - complexity : the new upper bound for the problem
         if self.lower_bound.value > complexity.value:
             print("Error, trying to put a upper bound (", complexity, ") lower than the current lower bound (", self.lower_bound , ")")
-            self.show()
+            print(self)
         if self.upper_bound.value > complexity.value:
             self.upper_bound = complexity
             if complexity == Complexity.Constant:

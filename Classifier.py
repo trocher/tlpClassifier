@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-from Problem import Problem
-from Problem import Constraints
+from Problem import Problem,Constraints
 from Complexity import Complexity,complexity_name
 from timeit import default_timer as timer
 import pickle
@@ -8,7 +7,7 @@ import Tools
 from Algorithms import constraint_reduction, looping_labels
 from FileHelp import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
-from TwoLabelsClassifier import getComplexityOf
+from TwoLabelsClassifier import getComplexityOf,constraints_to_bitvector_tuple
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
 LABELS = frozenset([1,2,3])
@@ -70,14 +69,7 @@ def two_labels_test(problems):
     res = set()
     for elem in problems:
         if len(elem.alphabet()) == 2 and len(elem.white_constraint)>0 and len(elem.black_constraint)>0:
-            white = util.zeros(WHITE_DEGREE+1)
-            black = util.zeros(BLACK_DEGREE+1)
-            label = list(elem.alphabet())[0]-1
-            for configuration in elem.white_constraint:
-                white[configuration[label]] = 1
-            for configuration in elem.black_constraint:
-                black[configuration[label]] = 1
-            elem.set_complexity(getComplexityOf(white,black))
+            elem.set_complexity(getComplexityOf(*constraints_to_bitvector_tuple(elem.white_constraint,elem.black_constraint,elem.alphabet(),WHITE_DEGREE,BLACK_DEGREE)))
 
 # Classify the given set of problems
 def classify(problems):
@@ -93,8 +85,7 @@ def classify(problems):
             compute_restriction_relaxations(problems, classifiedSubset,complexity)
     for problem in problems:
         if len(problem.white_constraint) != 0 and len(problem.black_constraint) != 0 and len(problem.alphabet()) == 3 and len(looping_labels(problem.white_constraint,problem.black_constraint)) == 2:
-            problem.show()
-            print(problem.get_complexity())
+            print(problem)
     store(WHITE_DEGREE,BLACK_DEGREE,problems,"C")
     for complexity in Complexity:
         classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
