@@ -49,3 +49,5 @@ def getComplexityOf(white_constraint,black_constraint):
     if(is_global(white_constraint,black_constraint,white_d,black_d) or is_global(black_constraint,white_constraint,black_d,white_d)):
         return Complexity.Global
     return Complexity.Logarithmic
+
+print(getComplexityOf(bitarray('010'),bitarray('0100')))

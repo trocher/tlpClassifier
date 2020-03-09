@@ -5,9 +5,8 @@ from Complexity import Complexity,complexity_name
 from timeit import default_timer as timer
 import pickle
 import Tools
-from ConstraintReductionAlgorithm import constraint_reduction
-from FileHelp import data_name, problems_to_file,add_degree_suffix
-from Almost2LabelsAlgorithm import looping_labels
+from Algorithms import constraint_reduction, looping_labels
+from FileHelp import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
 from TwoLabelsClassifier import getComplexityOf
 WHITE_DEGREE = 2
@@ -19,10 +18,6 @@ DEBUG = True
 STORE = True
 #STORE = False
 
-def import_data_set(white_degree, black_degree):
-    with open(data_name(white_degree,black_degree), 'rb') as problem_file:
-        problems = pickle.load(problem_file)
-    return problems
 
 # Classify the problems of the given set according to the given complexity
 def compute_restriction_relaxations(problems, that, complexity):
@@ -74,13 +69,13 @@ def constant_test(problems):
 def two_labels_test(problems):
     res = set()
     for elem in problems:
-        if len(elem.reduced_alphabet()) == 2 and len(elem.reduced_white_constraint)>0 and len(elem.reduced_black_constraint)>0:
+        if len(elem.alphabet()) == 2 and len(elem.white_constraint)>0 and len(elem.black_constraint)>0:
             white = util.zeros(WHITE_DEGREE+1)
             black = util.zeros(BLACK_DEGREE+1)
-            label = list(elem.reduced_alphabet())[0]-1
-            for configuration in elem.reduced_white_constraint:
+            label = list(elem.alphabet())[0]-1
+            for configuration in elem.white_constraint:
                 white[configuration[label]] = 1
-            for configuration in elem.reduced_black_constraint:
+            for configuration in elem.black_constraint:
                 black[configuration[label]] = 1
             elem.set_complexity(getComplexityOf(white,black))
 
@@ -88,7 +83,6 @@ def two_labels_test(problems):
 def classify(problems):
     print(len(problems), "problems in the dataset")
     print("degrees : (",WHITE_DEGREE,BLACK_DEGREE,")\n")
-
     two_labels_test(problems)
     unsolvable_test(problems)
     constant_test(problems)
@@ -97,6 +91,11 @@ def classify(problems):
         classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
         if complexity != Complexity.Unclassified:
             compute_restriction_relaxations(problems, classifiedSubset,complexity)
+    for problem in problems:
+        if len(problem.white_constraint) != 0 and len(problem.black_constraint) != 0 and len(problem.alphabet()) == 3 and len(looping_labels(problem.white_constraint,problem.black_constraint)) == 2:
+            problem.show()
+            print(problem.get_complexity())
+    store(WHITE_DEGREE,BLACK_DEGREE,problems,"C")
     for complexity in Complexity:
         classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
         total += len(classifiedSubset)
@@ -108,5 +107,5 @@ def classify(problems):
     if total != len(problems):
         print("Error, the sum of classified problems is not equal to the total number of problems")
 
-problems = import_data_set(WHITE_DEGREE,BLACK_DEGREE)
+problems = import_data_set(WHITE_DEGREE,BLACK_DEGREE,"UC")
 classify(problems)

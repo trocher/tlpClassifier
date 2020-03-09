@@ -38,5 +38,8 @@ class TestProblem(unittest.TestCase):
         self.assertTrue(problem1.is_restriction(problem2))
         self.assertFalse(problem2.is_restriction(problem3))
 
+    def test_equivalent_set(self):
+        problem1 = Problem(set([(1,2,0),(2,1,0)]), set([(1,2,0),(3,0,0)]), 3, 3)
+
 if __name__ == '__main__':
     unittest.main()

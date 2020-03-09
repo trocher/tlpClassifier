@@ -1,8 +1,7 @@
 from Complexity import Complexity, complexity_name
 from enum import Enum
 import itertools
-from ConstraintReductionAlgorithm import constraint_reduction
-import ConstraintReductionAlgorithm
+from Algorithms import constraint_reduction
 class Constraints(Enum):
     White = 0
     Black = 1 
@@ -17,7 +16,6 @@ class Problem:
     def __init__(self, white_constraint, black_constraint, white_degree, black_degree):
         self.white_constraint = frozenset(white_constraint)
         self.black_constraint = frozenset(black_constraint)
-        self.reduced_white_constraint, self.reduced_black_constraint = constraint_reduction(white_constraint,black_constraint)
         self.white_degree = white_degree
         self.black_degree = black_degree
         self.lower_bound = Complexity.Constant
@@ -36,12 +34,12 @@ class Problem:
         print("W degree =", self.white_degree, "| B degree =", self.black_degree, "| Alphabet :", self.alphabet())
         print("White Constraint : ", self.white_constraint)
         print("Black Constraint : ", self.black_constraint)
-        print("Reduced alphabet : ", self.reduced_alphabet())
-        print("Reduced White Constraint : ", self.reduced_white_constraint)
-        print("Reduced Black Constraint : ", self.reduced_black_constraint)
         if(self.get_complexity()==Complexity.Unclassified):
             print("Lower bound : ", complexity_name[self.lower_bound],"Upper bound : ", complexity_name[self.upper_bound])
+        else :
+            print("Complexity : ", complexity_name[self.lower_bound])
         print(" ")
+
 
     # Write the main characteristics of the problem in a file
     # io is the stream where the problem should be written
@@ -49,9 +47,6 @@ class Problem:
         io.write("W degree = "+ str(self.white_degree) + " | B degree = " + str(self.black_degree) + " | Alphabet : " + str(self.alphabet()) +"\n")
         io.write("White Constraint : " + str(set(self.white_constraint))+"\n")
         io.write("Black Constraint : " + str(set(self.black_constraint))+"\n")
-        io.write("Reduced alphabet : " + str(self.reduced_alphabet())+"\n")
-        io.write("Reduced white Constraint : " + str(self.reduced_white_constraint)+"\n")
-        io.write("Reduced black Constraint : " + str(self.reduced_black_constraint)+"\n")
         if(self.get_complexity()==Complexity.Unclassified):
             io.write("Lower bound : " + complexity_name[self.lower_bound] + " | Upper bound : " + complexity_name[self.upper_bound] + "\n")
         io.write("\n")
@@ -67,9 +62,6 @@ class Problem:
                     alphabet.add(label)
         return alphabet 
 
-    def reduced_alphabet(self):
-        return ConstraintReductionAlgorithm.constraint_alphabet(self.reduced_black_constraint).union(ConstraintReductionAlgorithm.constraint_alphabet(self.reduced_white_constraint))
-    
     # Return the size of the alphabet of the given constraint
     # constraint is either Constraints.Black or Constraints.Black
     def constraint_size(self, constraint):
@@ -140,3 +132,24 @@ class Problem:
     # Get the complexity of the problem
     def get_complexity(self):
         return self.lower_bound if (self.lower_bound == self.upper_bound) else Complexity.Unclassified
+
+    # Return a list of equivalents problem to the given problem
+    def equivalent_problems(self):
+        x = constraint_reduction(self.white_constraint,self.black_constraint)
+        problemList = [[[ (t[a],t[b],t[c]) for t in x] for x in x] for a,b,c in itertools.permutations([0,1,2])]
+        if self.black_degree == self.white_degree:
+            problemList+=([[b,w] for w,b in problemList])
+        return problemList
+
+    def get_characteristic_problem(self):
+        equivalent_problems_list = self.equivalent_problems()
+        for white,black in equivalent_problems_list:
+            white.sort()
+            black.sort() 
+        equivalent_problems_list.sort()
+        white_c,black_c = equivalent_problems_list[0]
+        return Problem(white_c,black_c,self.white_degree,self.black_degree)
+
+    # Return true if and only if the given problem is the unique characteristic problem of all of its equivalents problems
+    def is_characteristic_problem(self):
+        return self.get_characteristic_problem() == self
