@@ -1,5 +1,5 @@
 import numpy as np
-
+LABELS = [0,1,2]
 def adjancy_matrix(constraint):
     matrix = np.array([[0, 0, 0],[0, 0, 0], [0, 0, 0]])
     for configuration in constraint:
@@ -15,5 +15,4 @@ def matrix_computation(w, b):
 
 def looping_labels(white_constraint,black_constraint):
     matrix = matrix_computation(adjancy_matrix(white_constraint),adjancy_matrix(black_constraint))
-    lst = [i+1 for i in range (0,3) if matrix[i][i]]
-    return (lst)
+    return [i for i in LABELS if matrix[i][i]]

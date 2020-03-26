@@ -53,9 +53,11 @@ def getComplexityOf(white_constraint,black_constraint):
 def constraints_to_bitvector_tuple(white_constraint,black_constraint,alphabet,white_degree,black_degree):
     white = util.zeros(white_degree+1)
     black = util.zeros(black_degree+1)
-    label = list(alphabet)[0]-1
+    label = list(alphabet)[0]
     for configuration in white_constraint:
         white[configuration[label]] = 1
     for configuration in black_constraint:
         black[configuration[label]] = 1
     return (white,black)
+
+print(getComplexityOf(bitarray('010'),bitarray('1101')))

@@ -2,6 +2,7 @@ from Complexity import Complexity, complexity_name
 from enum import Enum
 import itertools
 from Algorithms import constraint_reduction
+LABELS = [0,1,2]
 class Constraints(Enum):
     White = 0
     Black = 1 
@@ -20,7 +21,6 @@ class Problem:
         self.black_degree = black_degree
         self.lower_bound = Complexity.Constant
         self.upper_bound = Complexity.Unsolvable
-
     # The hash function for problems
     def __hash__(self):
         return hash((self.white_constraint,self.black_constraint))
@@ -28,6 +28,7 @@ class Problem:
     # Equality of problem.
     def __eq__(self,other):
         return (self.white_constraint == other.white_constraint and self.black_constraint == other.black_constraint)
+
     # Print the main characteristics of the problem in the console
     def __repr__(self):
         def mapping_function(configuration):
@@ -39,7 +40,6 @@ class Problem:
             return  res + "Lower bound : "+ complexity_name[self.lower_bound] + "\n" + "Upper bound : " + complexity_name[self.upper_bound] + "\n"
         else :
             return res + "Complexity : "+ complexity_name[self.lower_bound] + "\n"
-    # Print the main characteristics of the problem in the console
 
     # Write the main characteristics of the problem in a file
     # io is the stream where the problem should be written
@@ -52,8 +52,8 @@ class Problem:
         alphabet = set()
         config = self.black_constraint if constraint == Constraints.Black else self.white_constraint
         for elem in config:
-            for label in [1,2,3]:
-                if elem[label-1] != 0:
+            for label in LABELS:
+                if elem[label] != 0:
                     alphabet.add(label)
         return alphabet 
 
@@ -119,8 +119,8 @@ class Problem:
     # Set the complexity of the problem to the given complexity
     # complexity, a Complexity
     def set_complexity(self,complexity):
-        # Inputs:
-        #       - complexity : the new lower bound for the problem
+        if self.lower_bound == self.upper_bound and self.lower_bound != Complexity.Unclassified and self.lower_bound != complexity:
+            print("error a different complexity has already been assigned")
         self.set_lower_bound(complexity)
         self.set_upper_bound(complexity)
 
@@ -128,7 +128,7 @@ class Problem:
     def get_complexity(self):
         return self.lower_bound if (self.lower_bound == self.upper_bound) else Complexity.Unclassified
 
-    # Return a list of equivalents problem to the given problem
+    # Return a list of equivalents problem to the given problem as constraints tuple
     def equivalent_problems(self):
         x = constraint_reduction(self.white_constraint,self.black_constraint)
         problemList = [[[ (t[a],t[b],t[c]) for t in x] for x in x] for a,b,c in itertools.permutations([0,1,2])]
@@ -136,6 +136,11 @@ class Problem:
             problemList+=([[b,w] for w,b in problemList])
         return problemList
 
+    # Return a list of equivalents problem to the given problem
+    def equivalent_problems_instance(self):
+        return [Problem(w,b,self.white_degree,self.black_degree) for w,b in self.equivalent_problems()]
+    
+    # Return the characteristic problem of the equiavalent class of problems of this problem
     def get_characteristic_problem(self):
         equivalent_problems_list = self.equivalent_problems()
         for white,black in equivalent_problems_list:
