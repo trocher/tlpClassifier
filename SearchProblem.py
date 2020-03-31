@@ -25,10 +25,9 @@ def search_border_problems(problems, relaxations, restrictions):
 
 problems,relaxations,restrictions = import_data_set(WHITE_DEGREE, BLACK_DEGREE,"C")
 
-white_constraint = {'AC', 'AB'}
-black_constraint = {'ABB', 'BBC', 'BCC', 'CCC', 'AAA', 'BBB', 'ACC', 'ABC'}
-#black_constraint = {'ABB', 'ABC', 'ACC', 'BBB'}
+white_constraint = {'AC', 'BC', 'AB'}
+black_constraint = {'CCC', 'AAA', 'BBB', 'ABC'}
 alpha_problem = (white_constraint,black_constraint,WHITE_DEGREE,BLACK_DEGREE)
 
-print(search(alpha_problem,problems, relaxations, restrictions))
-#search_border_problems(problems,relaxations,restrictions)
+#print(search(alpha_problem,problems, relaxations, restrictions))
+search_border_problems(problems,relaxations,restrictions)

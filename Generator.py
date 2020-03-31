@@ -4,7 +4,7 @@ from Problem import Problem
 from FileHelp import data_name, store
 from timeit import default_timer as timer
 
-WHITE_DEGREE = 2
+WHITE_DEGREE = 3
 BLACK_DEGREE = 3
 
 DEBUG = True

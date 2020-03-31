@@ -15,8 +15,7 @@ class Problem:
     # whiteDegree an int, the degree of the white nodes
     # blackDegree an int, the degree of the black nodes
     def __init__(self, white_constraint, black_constraint, white_degree, black_degree):
-        self.white_constraint = frozenset(white_constraint)
-        self.black_constraint = frozenset(black_constraint)
+        self.white_constraint,self.black_constraint = map(lambda x : frozenset(x),constraint_reduction(frozenset(white_constraint),frozenset(black_constraint)))
         self.white_degree = white_degree
         self.black_degree = black_degree
         self.lower_bound = Complexity.Constant
@@ -130,7 +129,8 @@ class Problem:
 
     # Return a list of equivalents problem to the given problem as constraints tuple
     def equivalent_problems(self):
-        x = constraint_reduction(self.white_constraint,self.black_constraint)
+        #x = constraint_reduction(self.white_constraint,self.black_constraint)
+        x = (self.white_constraint,self.black_constraint)
         problemList = [[[ (t[a],t[b],t[c]) for t in x] for x in x] for a,b,c in itertools.permutations([0,1,2])]
         if self.black_degree == self.white_degree:
             problemList+=([[b,w] for w,b in problemList])

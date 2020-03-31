@@ -4,7 +4,7 @@ from Complexity import Complexity,complexity_name
 from timeit import default_timer as timer
 import pickle
 import Tools
-from Algorithms import constraint_reduction, looping_labels,redundancy_algorithm
+from Algorithms import constraint_reduction, looping_labels,redundancy_algorithm, greedy4Coloring
 from FileHelp import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
 from TwoLabelsClassifier import getComplexityOf,constraints_to_bitvector_tuple
@@ -53,12 +53,13 @@ def constant_test(problem):
 
 
 def two_labels_test(problem):
-    if len(problem.alphabet()) == 2 and len(problem.white_constraint)>0 and len(problem.black_constraint)>0:
+    if len(problem.alphabet()) < 3 and len(problem.white_constraint)>0 and len(problem.black_constraint)>0:
         problem.set_complexity(getComplexityOf(*constraints_to_bitvector_tuple(problem.white_constraint,problem.black_constraint,problem.alphabet(),WHITE_DEGREE,BLACK_DEGREE)))
 
 def global_test(problem):
     if len(problem.white_constraint) != 0 and len(problem.black_constraint) != 0 and len(problem.alphabet()) == len(LABELS) and len(looping_labels(problem.white_constraint,problem.black_constraint)) == 2:
         problem.set_complexity(Complexity.Global)
+        print(problem)
 
 def redundant_label_test(problem):
     if problem.alphabet_size() == 3:
@@ -73,17 +74,21 @@ def classify(problems,relaxations,restrictions):
     new_complexity = Complexity.Unclassified
     for problem in problems:
         
-        two_labels_test(problem)
-        unsolvable_test(problem)
+        two_labels_test(problem) ##
+        unsolvable_test(problem) ##
         constant_test(problem)
         global_test(problem)
         redundant_label_test(problem)
-    
+        #if greedy4Coloring(problem.white_constraint,problem.black_constraint):
+        #    problem.set_upper_bound(Complexity.Iterated_Logarithmic)
+        #    if problem.get_complexity() == Complexity.Unclassified:
+        #        print(problem)
+#
         if any([problem == Tools.alpha_to_problem(elem) for elem in CONSTANTS]):
             problem.set_complexity(Complexity.Constant)
         if any([problem == Tools.alpha_to_problem(elem) for elem in GLOBALS]):
             problem.set_complexity(Complexity.Global)
-    
+
     for complexity in Complexity:
         if complexity != Complexity.Unclassified:
             classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
@@ -91,7 +96,9 @@ def classify(problems,relaxations,restrictions):
 
 
     store(WHITE_DEGREE,BLACK_DEGREE,(problems,relaxations,restrictions),"C")
-    
+#    for problem in problems:
+#        if problem.get_complexity == Complexity.Unclassified and problem.upper_bound <= Complexity.Logarithmic:
+#            problems_to_file("output/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
     for complexity in Complexity:
         classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
         if DEBUG:
