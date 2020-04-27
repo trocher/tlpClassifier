@@ -1,4 +1,6 @@
 import numpy as np
+import subprocess
+import re
 LABELS = set([0,1,2])
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
@@ -71,3 +73,23 @@ def looping_labels(white_constraint,black_constraint):
 
     matrix = matrix_computation(adjancy_matrix(white_constraint),adjancy_matrix(black_constraint))
     return [i for i in LABELS if matrix[i][i]]
+
+def unique_identifiers_constant(white_constraint,black_constraint):
+    for i in LABELS:
+        white = {(1 if i == 0 or x == 0 else 0, 1 if i == 1 or x == 1 else 0, 1 if i == 2 or x ==2 else 0) for x in LABELS-set([i])}
+        if white_constraint == white:
+            bc_i = map(lambda x : list(x)[i],black_constraint)
+            if set([0,1,2,3]).issubset(set(bc_i)):
+                return True
+
+def round_eliminator(problem,iter):
+    file_name = str(hash(problem))
+    #file_name = "-1974836627225542599"
+    result_b = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_b.txt','--iter',str(iter),'--labels','3'],stdout=subprocess.PIPE, text=True)
+    result_w = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_w.txt','--iter',str(iter),'--labels','3'],stdout=subprocess.PIPE, text=True)
+    if not result_b.stdout and not result_w.stdout:
+        return -1
+    else :
+        def get_upper_bound(result):
+            return int(re.search(r'\d+', result.split('\n')[1]).group())
+        return min(get_upper_bound(result_w.stdout),get_upper_bound(result_b.stdout))

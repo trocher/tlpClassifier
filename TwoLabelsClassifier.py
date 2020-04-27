@@ -60,4 +60,4 @@ def constraints_to_bitvector_tuple(white_constraint,black_constraint,alphabet,wh
         black[configuration[label]] = 1
     return (white,black)
 
-print(getComplexityOf(bitarray('011'),bitarray('1100')))
+#print(getComplexityOf(bitarray("010"),bitarray("0110")))

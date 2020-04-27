@@ -20,6 +20,7 @@ class Problem:
         self.black_degree = black_degree
         self.lower_bound = Complexity.Constant
         self.upper_bound = Complexity.Unsolvable
+        self.constant_upper_bound = 1000 
     # The hash function for problems
     def __hash__(self):
         return hash((self.white_constraint,self.black_constraint))
@@ -32,18 +33,32 @@ class Problem:
     def __repr__(self):
         def mapping_function(configuration):
             return "A"*configuration[2]+"B"*configuration[1]+"C"*configuration[0]
-        w = "White Constraint : " + ", ".join(map(mapping_function,self.white_constraint))
-        b = "Black Constraint : " + ", ".join(map(mapping_function,self.black_constraint))
+        w = ", ".join(map(mapping_function,self.white_constraint))
+        b = ", ".join(map(mapping_function,self.black_constraint))
         res = w + "\n" + b + "\n"
-        if(self.get_complexity()==Complexity.Unclassified):
+        if(self.get_complexity() == Complexity.Unclassified):
             return  res + "Lower bound : "+ complexity_name[self.lower_bound] + "\n" + "Upper bound : " + complexity_name[self.upper_bound] + "\n"
         else :
-            return res + "Complexity : "+ complexity_name[self.lower_bound] + "\n"
+            res = res + "Complexity : "+ complexity_name[self.lower_bound] + "\n"
+        if(self.get_complexity() == Complexity.Constant):
+            return res + str(self.constant_upper_bound) + " round(s) upper bound\n"
+        return res
 
     # Write the main characteristics of the problem in a file
     # io is the stream where the problem should be written
     def write_in_file(self, io):
         io.write(self.__repr__()+"\n")
+
+
+    def write_in_file_RE(self, name):
+        f= open(name,"w+")
+        def mapping_function(configuration):
+            return "A "*configuration[2]+"B "*configuration[1]+"C "*configuration[0]+"\n"
+        w = "".join(map(mapping_function,self.white_constraint))
+        b = "".join(map(mapping_function,self.black_constraint))
+        #print(w + "\n" + b + "\n\n")
+        f.write(w + "\n" + b + "\n")
+        f.close()
 
     # Return the alphabet of the given constraint
     # constraint is either Constraints.Black or Constraints.Black
