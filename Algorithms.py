@@ -1,6 +1,7 @@
 import numpy as np
 import subprocess
 import re
+import itertools
 LABELS = set([0,1,2])
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
@@ -31,6 +32,9 @@ def constraint_reduction(white_constraint, black_constraint):
         black_constraint = configurations_without(black_constraint,tmp)
     return(white_constraint,black_constraint)
 
+
+#for tuple (x,x) if alphabet =3
+#on the doc (x,x) (ex : 3,2)
 def redundancy_algorithm(white_constraint,black_constraint):
     def relabeled_configurations(constraint,i,j):
         tmp = set()
@@ -51,10 +55,14 @@ def redundancy_algorithm(white_constraint,black_constraint):
                 return (configurations_without(white_constraint,set([j])),configurations_without(black_constraint,set([j])), LABELS - set([j]))
     return None
 
-def greedy4Coloring(white_constraint,black_constraint):
+
+# For tuple (2,3)
+# on the doc (3,2)
+# could be (3,x)
+def greedy4Coloring(problem):
     white = set([(1,1,0),(0,1,1),(1,0,1)])
     black = set([(BLACK_DEGREE,0,0),(0,BLACK_DEGREE,0),(0,0,BLACK_DEGREE)])
-    if white == white_constraint and black.issubset(black_constraint) and len(black_constraint) > 3:
+    if white == problem.white_constraint and black.issubset(problem.black_constraint) and len(problem.black_constraint) > 3:
         return True
 
 def looping_labels(white_constraint,black_constraint):
@@ -74,14 +82,6 @@ def looping_labels(white_constraint,black_constraint):
     matrix = matrix_computation(adjancy_matrix(white_constraint),adjancy_matrix(black_constraint))
     return [i for i in LABELS if matrix[i][i]]
 
-def unique_identifiers_constant(white_constraint,black_constraint):
-    for i in LABELS:
-        white = {(1 if i == 0 or x == 0 else 0, 1 if i == 1 or x == 1 else 0, 1 if i == 2 or x ==2 else 0) for x in LABELS-set([i])}
-        if white_constraint == white:
-            bc_i = map(lambda x : list(x)[i],black_constraint)
-            if set([0,1,2,3]).issubset(set(bc_i)):
-                return True
-
 def round_eliminator(problem,iter):
     file_name = str(hash(problem))
     #file_name = "-1974836627225542599"
@@ -93,3 +93,50 @@ def round_eliminator(problem,iter):
         def get_upper_bound(result):
             return int(re.search(r'\d+', result.split('\n')[1]).group())
         return min(get_upper_bound(result_w.stdout),get_upper_bound(result_b.stdout))
+
+def cover_map_1(white_constraint,black_constraint):
+    w = set([(w0-b0,w1-b1,w2-b2) for (w0,w1,w2) in black_constraint for (b0,b1,b2) in white_constraint if w0-b0 >= 0 and w1-b1 >=0 and w2-b2>=0])
+    b = set([(w0a+w0b,w1a+w1b,w2a+w2b) for (w0a,w1a,w2a) in w for (w0b,w1b,w2b) in w if (w0a+w0b,w1a+w1b,w2a+w2b) in white_constraint])
+    return not b
+
+def log_test(white_constraint,black_constraint):
+    def num_to_alpha_configuration(num_configuration):
+        return "A"*num_configuration[0]+"B"*num_configuration[1]+"C"*num_configuration[2]
+
+    def alpha_to_num_configuration(alpha_configuration):
+        return (alpha_configuration.count('A'),alpha_configuration.count('B'),alpha_configuration.count('C'))
+
+    def can_be_neighbors(ordered_configuration_1,ordered_configuration_2,white_constraint):
+        zipped_configurations = list(zip(ordered_configuration_1,ordered_configuration_2))
+        return all([alpha_to_num_configuration(x) in white_constraint for x in zipped_configurations])
+
+    def c_ordered_configurations(a,b):
+        lst = [
+            (a[0],a[1],b[2]),
+            (a[0],b[1],b[2]),
+            (a[0],b[1],a[2]),
+            (b[0],a[1],b[2]),
+            (b[0],a[1],a[2]),
+            (b[0],b[1],a[2])
+        ]
+        return lst
+
+    black_c_alpha = [list(num_to_alpha_configuration(x)) for x in black_constraint]
+    black_c_ordered_alpha = list({x for lst in black_c_alpha for x in itertools.permutations(lst)})
+    for a in black_c_alpha:
+        y = [b for b in black_c_ordered_alpha if can_be_neighbors(a,b,white_constraint)]
+        for b in y:
+            c = c_ordered_configurations(a,b)
+            if all([any([can_be_neighbors(x,y,white_constraint) for y in black_c_ordered_alpha]) for x in c]):
+                #print(" a  : ", a)
+                #print(" b  : ", b)
+                return True
+    return False
+
+
+#def sinkless_sourceless(white_constraint,black_constraint):
+#    for elem in black_constraint:
+#        for elem2 in black_constraint
+
+def local_neighborhood(white_constraint,black_constraint):
+    return any([x in black_constraint for x in [(3,0,0),(0,3,0),(0,0,3)]])

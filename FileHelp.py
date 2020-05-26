@@ -8,6 +8,7 @@ def data_name(white_degree,black_degree):
     return add_degree_suffix("data/problemSet",white_degree,black_degree)
 
 def import_data_set(white_degree, black_degree,classified):
+    problems = (set(), dict(), dict())
     with open(data_name(white_degree,black_degree) + '_' + classified, 'rb') as problem_file:
         problems = pickle.load(problem_file)
     return problems

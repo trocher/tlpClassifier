@@ -59,5 +59,3 @@ def constraints_to_bitvector_tuple(white_constraint,black_constraint,alphabet,wh
     for configuration in black_constraint:
         black[configuration[label]] = 1
     return (white,black)
-
-#print(getComplexityOf(bitarray("010"),bitarray("0110")))

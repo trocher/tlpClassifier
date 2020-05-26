@@ -32,7 +32,7 @@ class Problem:
     # Print the main characteristics of the problem in the console
     def __repr__(self):
         def mapping_function(configuration):
-            return "A"*configuration[2]+"B"*configuration[1]+"C"*configuration[0]
+            return "A"*configuration[0]+"B"*configuration[1]+"C"*configuration[2]
         w = ", ".join(map(mapping_function,self.white_constraint))
         b = ", ".join(map(mapping_function,self.black_constraint))
         res = w + "\n" + b + "\n"
@@ -53,7 +53,7 @@ class Problem:
     def write_in_file_RE(self, name):
         f= open(name,"w+")
         def mapping_function(configuration):
-            return "A "*configuration[2]+"B "*configuration[1]+"C "*configuration[0]+"\n"
+            return "A "*configuration[0]+"B "*configuration[1]+"C "*configuration[2]+"\n"
         w = "".join(map(mapping_function,self.white_constraint))
         b = "".join(map(mapping_function,self.black_constraint))
         #print(w + "\n" + b + "\n\n")

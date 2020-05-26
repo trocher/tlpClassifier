@@ -9,8 +9,13 @@ def edge_3_labelling(degree):
 def powerset(that):
     return set(itertools.chain.from_iterable(itertools.combinations(that, r) for r in range(len(that)+1)))
 
+def num_to_alpha_configuration(num_configuration):
+    return "A"*num_configuration[0]+"B"*num_configuration[1]+"C"*num_configuration[2]
+
+def alpha_to_num_configuration(alpha_configuration):
+    return (alpha_configuration.count('A'),alpha_configuration.count('B'),alpha_configuration.count('C'))
 def alpha_to_num_constraint( alpha_constraint):
-    return [(x.count('A'),x.count('B'),x.count('C')) for x in alpha_constraint]
+    return [alpha_to_num_configuration(x) for x in alpha_constraint]
 
 def alpha_to_problem(alpha_problem):
     white_degree = alpha_problem[2]
