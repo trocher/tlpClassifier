@@ -1,20 +1,12 @@
 WHITEDEGREE = 2
 BLACKDEGREE = 3
 
-CONSTANTS = [
-
-    # Weak 2 coloring
-    ({'AB', 'CC'},
-    {'AAA', 'AAC', 'ACC', 'BBB', 'BBC', 'BCC'},
-    2,3)
-]
-
-
 GLOBALS = [
     ({'AC', 'AB'},
     {'ABC'},
     2,3)
 ]
+
 ITERATED_LOGARITHMIC = [
     #MIS
     ({'BC', 'AA'},
@@ -34,7 +26,7 @@ LOGARITHMIC2 = [
 
     # 3 edge coloring on latex
     ({'AA', 'BB', 'CC'},
-    {'ABC'},2,3)
+    {'ABC'},2,3),
 
 
     # 2 partial 2 coloring
@@ -43,45 +35,30 @@ LOGARITHMIC2 = [
 
 ]
 LOGARITHMIC = [
-    ({'AC', 'BC', 'BB', 'AA', 'AB'},
-    {'ACC', 'CCC', 'BCC', 'ABC'},
-    2,3),
-
-    # R&C
-    ({'BB', 'AC', 'AA', 'AB'},
-    {'ABC'},
-    2,3),
-
     #########
-    # B C 
-    # A A
+    # A B 
+    # C C
     #
-    # A A B 
+    # C C B 
     # A C ABC
 
 
-    ({'BC', 'AA'},
-    {'AAB', 'ACA'},
+    ({'AB', 'CC'},
+    {'CCB', 'ACC'},
     2,3),
 
-    ({'BC', 'AA'},
-    {'AAB', 'ACB'},
+    ({'AB', 'CC'},
+    {'BCC', 'AAC'},
     2,3),
 
-    ({'BC', 'AA'},
-    {'AAB', 'ACC'},
-    2,3),
     #####
-    ({'BC', 'AA'},
-    {'AAB', 'BBC'},
+    ({'AB', 'CC'},
+    {'BCC', 'ABB'},
     2,3),
 
-    ({'BC', 'AA', 'AB'},
-    {'AAC', 'BBC'},
+    ({'AB', 'CC', 'CB'},
+    {'ACC', 'BBA'},
     2,3),
-
-    ({'BC', 'AA', 'AB'},
-    {'ABB', 'AAC'},2,3),
 
 
 # SOO done on latex
@@ -106,5 +83,90 @@ LOGARITHMIC = [
 
 # EO done on latex 2
     ({'AC','BC'},
-    {'ABB','BCC'},2,3)
+    {'ABB','BCC'},2,3),
+
+# R&C
+    ({'AB','CC'},
+    {'ABC'},2,3),
+
+# R&C
+    ({'AB','CC'},
+    {'AAB','BBC'},2,3),
+
+# R&C
+    ({'AB','CC'},
+    {'AAC','BBC'},2,3),
+
+# R&C
+    ({'AB','CC'},
+    {'AAB','BCC'},2,3),
+
+# R&C
+    ({'AB','CC'},
+    {'BCC','AAA'},2,3),
+
+# R&C
+    ({'AB','CC'},
+    {'BBC','AAA'},2,3)
+
+]
+
+LOGARITHMIC_LOWER_BOUND = [
+# fixed point 1
+    ({'AC', 'BB', 'CC', 'AA', 'BC'},
+    {'AAB','ABC','ABB'},2,3),
+
+# fixed point 1
+    ({'AC', 'AB', 'CC', 'BC'},
+    {'AAA','BBC','BBB','ABB'},2,3),
+
+# fixed point 2
+    ({'BB', 'CC', 'AA'},
+    {'BCC','BBC','AAC','AAB'},2,3),
+
+# fixed point 2
+    ({'BB', 'CC', 'AA'},
+    {'BCC','AAC','ABB'},2,3),
+
+# fixed point 2
+    ({'AB', 'CC'},
+    {'ABB','AAA','BBB','BCC','ACC'},2,3),
+    
+# fixed point 2
+    ({'AB', 'CC'},
+    {'AAB','AAA','BBB','BCC','AAC'},2,3),
+
+# fixed point 2
+    ({'CC', 'BC', 'AA'},
+    {'BBC','AAB','BBB','AAC','BCC'},2,3),
+
+# fixed point 2.5
+    ({'AB', 'CC'},
+    {'AAC','BBC','BBB','ABB'},2,3),
+
+# fixed point auto
+    ({'AB', 'CC'},
+    {'BCC','AAC','ABB'},2,3),
+
+# fixed point auto
+    ({'AB', 'CC'},
+    {'BCC','AAA','ABC'},2,3),
+
+# fixed point auto
+    ({'AB', 'CC'},
+    {'BBC','AAA','ABC'},2,3),
+
+
+# fixed point auto
+    ({'AB', 'CC'},
+    {'BCC','BBC','AAA'},2,3),
+
+
+# fixed point auto
+    ({'AB', 'CC'},
+    {'AAA','BBB','ABC'},2,3),
+
+# fixed point auto
+    ({'AB', 'CC'},
+    {'BCC','BBC','AAA','ABC'},2,3)
 ]

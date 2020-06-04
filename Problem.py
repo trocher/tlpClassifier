@@ -50,6 +50,14 @@ class Problem:
         io.write(self.__repr__()+"\n")
 
 
+
+    def print_RE(self):
+        def mapping_function(configuration):
+            return "A "*configuration[0]+"B "*configuration[1]+"C "*configuration[2]+"\n"
+        w = "".join(map(mapping_function,self.white_constraint))
+        b = "".join(map(mapping_function,self.black_constraint))
+        print(w + "\n" + b + "\n\n")
+
     def write_in_file_RE(self, name):
         f= open(name,"w+")
         def mapping_function(configuration):

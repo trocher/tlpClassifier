@@ -82,17 +82,43 @@ def looping_labels(white_constraint,black_constraint):
     matrix = matrix_computation(adjancy_matrix(white_constraint),adjancy_matrix(black_constraint))
     return [i for i in LABELS if matrix[i][i]]
 
-def round_eliminator(problem,iter):
+def round_eliminator(problem, iter, iterations):
     file_name = str(hash(problem))
-    #file_name = "-1974836627225542599"
-    result_b = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_b.txt','--iter',str(iter),'--labels','3'],stdout=subprocess.PIPE, text=True)
-    result_w = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_w.txt','--iter',str(iter),'--labels','3'],stdout=subprocess.PIPE, text=True)
+    print(file_name)
+    result_b = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_b.txt','--iter',str(iterations),'--labels','4'],stdout=subprocess.PIPE, text=True)
+    result_w = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_w.txt','--iter',str(iterations),'--labels','4'],stdout=subprocess.PIPE, text=True)
     if not result_b.stdout and not result_w.stdout:
         return -1
     else :
+        print("hellowww")
         def get_upper_bound(result):
             return int(re.search(r'\d+', result.split('\n')[1]).group())
-        return min(get_upper_bound(result_w.stdout),get_upper_bound(result_b.stdout))
+        w = 1000
+        b = 1000
+        if result_w.stdout:
+            w = get_upper_bound(result_w.stdout)
+        if result_b.stdout:
+            b = get_upper_bound(result_b.stdout)
+        return min(w,b)
+
+def round_eliminator_lb(problem,iterations,labels):
+    file_name = str(hash(problem))
+    print(file_name)
+    result_b = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autolb','-f','data/problems_RE/2_3/'+file_name + '_b.txt','--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
+    result_w = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autolb','-f','data/problems_RE/2_3/'+file_name + '_w.txt','--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
+    if not result_b.stdout and not result_w.stdout:
+        return -1
+    else :
+        print(file_name)
+        print("===========================")
+        def get_lower_bound(result):
+            if "Lower bound of " + str(iterations+1)+" rounds." in result:
+                return True
+            return False
+
+        if get_lower_bound(result_w.stdout) or get_lower_bound(result_b.stdout):
+            problem.print_RE()
+            return True
 
 def cover_map_1(white_constraint,black_constraint):
     w = set([(w0-b0,w1-b1,w2-b2) for (w0,w1,w2) in black_constraint for (b0,b1,b2) in white_constraint if w0-b0 >= 0 and w1-b1 >=0 and w2-b2>=0])
