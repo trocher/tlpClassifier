@@ -1,5 +1,5 @@
 import numpy
-from fileHelp import import_data_set
+from file_help import import_data_set
 from problem import Problem
 from complexity import Complexity
 from timeit import default_timer as timer

@@ -1,6 +1,6 @@
 import unittest
-from FileHelp import import_data_set
-from Complexity import Complexity
+from fileHelp import import_data_set
+from complexity import Complexity
 import pickle
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3

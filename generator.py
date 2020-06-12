@@ -2,7 +2,7 @@
 import sys, getopt
 from tools import edge_3_labelling,powerset
 from problem import Problem
-from fileHelp import data_name, store
+from file_help import data_name, store
 from problem_set import Problem_set
 import time
 from tqdm import tqdm
