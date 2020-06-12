@@ -9,7 +9,7 @@ from FileHelp import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
 from TwoLabelsClassifier import get_complexity_of,constraints_to_bitvector_tuple
 from Input import ITERATED_LOGARITHMIC, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
-
+from problem_set import Problem_set
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
 LABELS = frozenset([0,1,2])
@@ -134,8 +134,8 @@ def classify(problems,relaxations,restrictions):
             print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
         if STORE:
             problems_to_file("output/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
-    #store(WHITE_DEGREE,BLACK_DEGREE,(problems,relaxations,restrictions),"C")
+    #store(WHITE_DEGREE,BLACK_DEGREE,(problems,relaxations,restrictions),Problem_set.Classified)
 
 
-problems,relaxations,restrictions = import_data_set(WHITE_DEGREE,BLACK_DEGREE,"UC")
+problems,relaxations,restrictions = import_data_set(WHITE_DEGREE,BLACK_DEGREE,Problem_set.Unclassified)
 classify(problems,relaxations,restrictions)

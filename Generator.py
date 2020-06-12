@@ -46,30 +46,34 @@ def generate(white_degree, black_degree):
     print("Computing relaxations and restrictions ...")
     #for elem in tqdm(problems):
 
-    def processInput(elem,problems):
+    def processInput(elem):
         relaxations,restrictions = set(),set()
         equivalent_set = elem.equivalent_problems_instance()
         for other in problems:
             for x in equivalent_set:
                 if elem != other :
-                    if x.is_restriction(other) :
+                    if x.is_restriction(other):
                         relaxations.add(other)
-                    if x.is_relaxation(other) :
+                    if x.is_relaxation(other):
                         restrictions.add(other)
         return (relaxations,restrictions)
     
+
+
     t0= time.time()
     num_cores = multiprocessing.cpu_count()
-    values = Parallel(n_jobs=num_cores)(delayed(processInput)(problems_list[i],problems) for i in range(len(problems_list)))
+    #values = Parallel(n_jobs=num_cores)(delayed(processInput)(problems_list[i]) for i in tqdm(range(len(problems_list))))
+    values = [processInput(elem) for elem in tqdm(problems_list)]
     print(time.time()-t0)
-    relaxations, restrictions = map(list, zip(*values))
+    relaxations = [x for (x,y) in values]
+    restrictions = [y for (x,y) in values]
 
     relaxations_dict = dict(zip(problems_list, relaxations))
     relaxations_dict = dict(zip(problems_list, restrictions))
 
     t0= time.time()
-    for elem in problems:
-        processInput(elem,problems)
+    #for elem in problems:
+    #    processInput(elem)
     print(time.time()-t0)
     return (set(problems),relaxations_dict,restrictions_dict)
 

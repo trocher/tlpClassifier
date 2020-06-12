@@ -20,7 +20,7 @@ class Problem:
         self.black_degree = black_degree
         self.lower_bound = Complexity.Constant
         self.upper_bound = Complexity.Unsolvable
-        self.constant_upper_bound = 1000 
+        self.constant_upper_bound = 1000
     # The hash function for problems
     def __hash__(self):
         return hash((self.white_constraint,self.black_constraint))
