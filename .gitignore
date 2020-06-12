@@ -6,3 +6,6 @@ t.py
 .DS_Store
 *.pyc
 output/
+Graph.py
+ttt.py
+server

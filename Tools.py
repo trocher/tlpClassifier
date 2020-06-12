@@ -1,5 +1,5 @@
 import itertools
-from Problem import Problem
+from problem import Problem
 # Return the list of possible 3-labellings of node with a given degre
 
 def edge_3_labelling(degree):

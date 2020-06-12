@@ -1,5 +1,5 @@
 from bitarray import bitarray,util
-from Complexity import Complexity
+from complexity import Complexity
 
 def is_unsolvable(white_constraint,black_constraint,white_degree,black_degree):
     #I.a, I.c

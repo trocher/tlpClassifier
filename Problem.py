@@ -1,7 +1,7 @@
-from Complexity import Complexity, complexity_name
+from complexity import Complexity, complexity_name
 from enum import Enum
 import itertools
-from Algorithms import constraint_reduction
+from algorithms import constraint_reduction
 LABELS = [0,1,2]
 class Constraints(Enum):
     White = 0

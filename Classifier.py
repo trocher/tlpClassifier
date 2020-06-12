@@ -1,14 +1,14 @@
 #!/usr/bin/python3
-from Problem import Problem,Constraints
-from Complexity import Complexity,complexity_name
+from problem import Problem,Constraints
+from complexity import Complexity,complexity_name
 from tqdm import tqdm
 import pickle
-import Tools
-from Algorithms import constraint_reduction,redundancy_algorithm, greedy4Coloring,round_eliminator_ub,cover_map_1,log_test, round_eliminator_lb
-from FileHelp import import_data_set, problems_to_file,add_degree_suffix,store
+import tools
+from algorithms import constraint_reduction,redundancy_algorithm, greedy4Coloring,round_eliminator_ub,cover_map_1,log_test, round_eliminator_lb
+from fileHelp import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
-from TwoLabelsClassifier import get_complexity_of,constraints_to_bitvector_tuple
-from Input import ITERATED_LOGARITHMIC, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
+from two_labels_classifier import get_complexity_of,constraints_to_bitvector_tuple
+from input import ITERATED_LOGARITHMIC, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
 from problem_set import Problem_set
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
@@ -107,13 +107,13 @@ def classify(problems,relaxations,restrictions):
     partially_classify_debug(log_test_test)
     
     for problem in problems:
-        if any([problem == Tools.alpha_to_problem(elem) for elem in LOGARITHMIC_UPPER_BOUND]):
+        if any([problem == tools.alpha_to_problem(elem) for elem in LOGARITHMIC_UPPER_BOUND]):
             problem.set_upper_bound(Complexity.Logarithmic)
-        if any([problem == Tools.alpha_to_problem(elem) for elem in LOGARITHMIC_TIGHT]):
+        if any([problem == tools.alpha_to_problem(elem) for elem in LOGARITHMIC_TIGHT]):
             problem.set_complexity(Complexity.Logarithmic)
-        if any([problem == Tools.alpha_to_problem(elem) for elem in LOGARITHMIC_LOWER_BOUND]):
+        if any([problem == tools.alpha_to_problem(elem) for elem in LOGARITHMIC_LOWER_BOUND]):
             problem.set_lower_bound(Complexity.Logarithmic)
-        if any([problem == Tools.alpha_to_problem(elem) for elem in ITERATED_LOGARITHMIC]):
+        if any([problem == tools.alpha_to_problem(elem) for elem in ITERATED_LOGARITHMIC]):
             problem.set_complexity(Complexity.Iterated_Logarithmic)
 
 

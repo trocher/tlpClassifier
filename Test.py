@@ -1,6 +1,6 @@
 import unittest
 
-from Problem import Problem
+from problem import Problem
 
 class TestProblem(unittest.TestCase):
 

@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import sys, getopt
-from Tools import edge_3_labelling,powerset
-from Problem import Problem
-from FileHelp import data_name, store
+from tools import edge_3_labelling,powerset
+from problem import Problem
+from fileHelp import data_name, store
 from problem_set import Problem_set
 import time
 from tqdm import tqdm

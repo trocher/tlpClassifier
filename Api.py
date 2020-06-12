@@ -1,11 +1,11 @@
 import numpy
-from FileHelp import import_data_set
-from Problem import Problem
-from Complexity import Complexity
+from fileHelp import import_data_set
+from problem import Problem
+from complexity import Complexity
 from timeit import default_timer as timer
-from Tools import alpha_to_problem
-from Algorithms import local_neighborhood
-from Input import LOGARITHMIC_LOWER_BOUND
+from tools import alpha_to_problem
+from algorithms import local_neighborhood
+from input import LOGARITHMIC_LOWER_BOUND
 
 def get_problem(alpha_problem, problems):
     problem = alpha_to_problem(alpha_problem)

@@ -1,7 +1,7 @@
 import unittest
 
-from TwoLabelsClassifier import get_complexity_of
-from Complexity import Complexity
+from two_labels_classifier import get_complexity_of
+from complexity import Complexity
 from bitarray import bitarray
 from random import *
 import numpy as np

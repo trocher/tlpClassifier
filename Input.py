@@ -32,7 +32,7 @@ LOGARITHMIC_TIGHT = [
 ]
 LOGARITHMIC_UPPER_BOUND = [
 
-MISS 1
+#MISS 1
 
     ({'AB', 'CC'},
     {'CCB', 'ACC'},
@@ -42,7 +42,6 @@ MISS 1
     ({'AB', 'CC'},
     {'BCC', 'ABB'},
     2,3),
-
 
 # SOO done on latex
     ({'AC', 'BC'},
