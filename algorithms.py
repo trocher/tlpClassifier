@@ -84,9 +84,10 @@ def round_eliminator(problem, function, iterations, labels):
         temp_file_b.flush()
         temp_file_w.flush()
 
-        result_b = subprocess.run([SERVER_DIR,function,'-f',temp_file_b.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True).stdout
-        result_w = subprocess.run([SERVER_DIR,function,'-f',temp_file_w.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True).stdout
-        
+        result_bt = subprocess.run([SERVER_DIR,function,'-f',temp_file_b.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
+        result_wt = subprocess.run([SERVER_DIR,function,'-f',temp_file_w.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
+        result_b = result_bt.stdout
+        result_w = result_wt.stdout
         if not result_b and not result_w:
             return -1
         else :
