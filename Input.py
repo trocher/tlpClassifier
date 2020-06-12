@@ -1,12 +1,6 @@
 WHITEDEGREE = 2
 BLACKDEGREE = 3
 
-GLOBALS = [
-    ({'AC', 'AB'},
-    {'ABC'},
-    2,3)
-]
-
 ITERATED_LOGARITHMIC = [
     #MIS
     ({'BC', 'AA'},
@@ -15,8 +9,13 @@ ITERATED_LOGARITHMIC = [
     #MIS
     ({'AA', 'BC', 'AC'},
     {'CCC','AAB'},
+    2,3),
+
+    ({'AA', 'BC', 'CC'},
+    {'AAC','BBB','ABB'},
     2,3)
 ]
+
 LOGARITHMIC2 = [
 
     # 3 vertex coloring on latex
@@ -47,17 +46,9 @@ LOGARITHMIC = [
     {'CCB', 'ACC'},
     2,3),
 
-    ({'AB', 'CC'},
-    {'BCC', 'AAC'},
-    2,3),
-
     #####
     ({'AB', 'CC'},
     {'BCC', 'ABB'},
-    2,3),
-
-    ({'AB', 'CC', 'CB'},
-    {'ACC', 'BBA'},
     2,3),
 
 

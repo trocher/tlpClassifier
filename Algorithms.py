@@ -65,24 +65,7 @@ def greedy4Coloring(problem):
     if white == problem.white_constraint and black.issubset(problem.black_constraint) and len(problem.black_constraint) > 3:
         return True
 
-def looping_labels(white_constraint,black_constraint):
-    def adjancy_matrix(constraint):
-        matrix = np.array([[0, 0, 0],[0, 0, 0], [0, 0, 0]])
-        for configuration in constraint:
-            for x in range(0,3):
-                if configuration[x] != 0:
-                    adjancy_list = np.array(configuration)
-                    adjancy_list[x]-=1
-                    matrix[x] = [any(x) for x in zip(matrix[x],adjancy_list)]
-        return matrix
-
-    def matrix_computation(w, b):
-        return np.array([w,b,w@b,b@w,w@b@w,b@w@b]).sum(axis=0)
-
-    matrix = matrix_computation(adjancy_matrix(white_constraint),adjancy_matrix(black_constraint))
-    return [i for i in LABELS if matrix[i][i]]
-
-def round_eliminator(problem, iter, iterations):
+def round_eliminator_ub(problem, iter, iterations):
     file_name = str(hash(problem))
     print(file_name)
     result_b = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_b.txt','--iter',str(iterations),'--labels','4'],stdout=subprocess.PIPE, text=True)
@@ -154,15 +137,5 @@ def log_test(white_constraint,black_constraint):
         for b in y:
             c = c_ordered_configurations(a,b)
             if all([any([can_be_neighbors(x,y,white_constraint) for y in black_c_ordered_alpha]) for x in c]):
-                #print(" a  : ", a)
-                #print(" b  : ", b)
                 return True
     return False
-
-
-#def sinkless_sourceless(white_constraint,black_constraint):
-#    for elem in black_constraint:
-#        for elem2 in black_constraint
-
-def local_neighborhood(white_constraint,black_constraint):
-    return any([x in black_constraint for x in [(3,0,0),(0,3,0),(0,0,3)]])

@@ -1,18 +1,14 @@
 #!/usr/bin/python3
 from Problem import Problem,Constraints
 from Complexity import Complexity,complexity_name
-from timeit import default_timer as timer
-import time
 from tqdm import tqdm
 import pickle
 import Tools
-from Algorithms import constraint_reduction, looping_labels,redundancy_algorithm, greedy4Coloring,round_eliminator,cover_map_1,log_test, round_eliminator_lb
+from Algorithms import constraint_reduction,redundancy_algorithm, greedy4Coloring,round_eliminator_ub,cover_map_1,log_test, round_eliminator_lb
 from FileHelp import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
 from TwoLabelsClassifier import getComplexityOf,constraints_to_bitvector_tuple
-from Input import GLOBALS, LOGARITHMIC,ITERATED_LOGARITHMIC, LOGARITHMIC2, LOGARITHMIC_LOWER_BOUND
-from joblib import Parallel, delayed
-import multiprocessing
+from Input import ITERATED_LOGARITHMIC, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
 
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
@@ -46,34 +42,31 @@ def compute_restrictions(problems, that, complexity,restrictions):
             restr.set_lower_bound(complexity)
 
 # Return the subset of unsolvable problems
-def unsolvable_test(problem):
+def unsolvable_criteria(problem):
     if(len(problem.white_constraint)==0 or len(problem.black_constraint)==0):
         problem.set_complexity(Complexity.Unsolvable)
     else:
         problem.set_upper_bound(Complexity.Global)
 
-def global_test(problem):
-    if len(problem.white_constraint) != 0 and len(problem.black_constraint) != 0 and len(problem.alphabet()) == len(LABELS) and len(looping_labels(problem.white_constraint,problem.black_constraint)) == 2:
-        problem.set_complexity(Complexity.Global)
-        #print(problem)
-
 def two_labels_criteria(problem):
+    # Problems that are 2 labelling problems
     if len(problem.alphabet()) < 3 and len(problem.white_constraint) > 0 and len(problem.black_constraint) > 0:
         problem.set_complexity(getComplexityOf(*constraints_to_bitvector_tuple(problem.white_constraint,problem.black_constraint,problem.alphabet(),WHITE_DEGREE,BLACK_DEGREE)))
         return
+    # Redundancy of a label
     if problem.alphabet_size() == 3:
         tmp = redundancy_algorithm(problem.white_constraint,problem.black_constraint)
         if tmp != None:
             problem.set_complexity(getComplexityOf(*constraints_to_bitvector_tuple(tmp[0],tmp[1],tmp[2],WHITE_DEGREE,BLACK_DEGREE)))
 
-def round_eliminator_test(problem):
-    upper_bound = round_eliminator(problem, 5,6)
+def round_eliminator_ub_criteria(problem):
+    upper_bound = round_eliminator_ub(problem, 5,6)
     if upper_bound >= 0:
         problem.set_complexity(Complexity.Constant)
         problem.constant_upper_bound = min(problem.constant_upper_bound,upper_bound)
 
 
-def round_eliminator_lb_test(problem):
+def round_eliminator_lb_criteria(problem):
     lower_bound = round_eliminator_lb(problem, 15, 5)
 # Classify the given set of problems
 
@@ -89,39 +82,34 @@ def log_test_test(problem):
     if log_test(problem.white_constraint,problem.black_constraint):
         problem.set_upper_bound(Complexity.Logarithmic)
 
-def unclassified_problems(problems):
-    return {problem for problem in problems if problem.get_complexity() == Complexity.Unclassified}
-
-def solvable_problems(problems):
-    return {problem for problem in problems if problem.get_complexity() != Complexity.Unsolvable}
-
 
 def classify(problems,relaxations,restrictions):
     print("Starting classification (" + str(len(problems)) + " problems)...")
+    
+    def unclassified_problems(problems):
+        return {problem for problem in problems if problem.get_complexity() == Complexity.Unclassified}
+    def solvable_problems(problems):
+        return {problem for problem in problems if problem.get_complexity() != Complexity.Unsolvable}
 
     def partially_classify(function):
         for problem in tqdm(unclassified_problems(problems)):
             function(problem)
-
     def partially_classify_debug(function):
         for problem in tqdm(solvable_problems(problems)):
             function(problem)
 
-    partially_classify(unsolvable_test)
-    #partially_classify(round_eliminator_test)
-    #partially_classify(round_eliminator_lb_test)
-    partially_classify(two_labels_criteria)
-    #partially_classify(global_test)
+    partially_classify(unsolvable_criteria)
+    #partially_classify(round_eliminator_ub_criteria)
+    #partially_classify(round_eliminator_lb_criteria)
+    partially_classify_debug(two_labels_criteria)
     partially_classify_debug(greedy_4_coloring_test) #done
     partially_classify_debug(cover_map_test)
     partially_classify_debug(log_test_test)
     
     for problem in problems:
-        if any([problem == Tools.alpha_to_problem(elem) for elem in GLOBALS]):
-            problem.set_complexity(Complexity.Global)
-        if any([problem == Tools.alpha_to_problem(elem) for elem in LOGARITHMIC]):
+        if any([problem == Tools.alpha_to_problem(elem) for elem in LOGARITHMIC_UPPER_BOUND]):
             problem.set_upper_bound(Complexity.Logarithmic)
-        if any([problem == Tools.alpha_to_problem(elem) for elem in LOGARITHMIC2]):
+        if any([problem == Tools.alpha_to_problem(elem) for elem in LOGARITHMIC_TIGHT]):
             problem.set_complexity(Complexity.Logarithmic)
         if any([problem == Tools.alpha_to_problem(elem) for elem in LOGARITHMIC_LOWER_BOUND]):
             problem.set_lower_bound(Complexity.Logarithmic)
@@ -150,10 +138,8 @@ def classify(problems,relaxations,restrictions):
             print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
         if STORE:
             problems_to_file("output/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
-#store(WHITE_DEGREE,BLACK_DEGREE,(problems,relaxations,restrictions),"C")
+    #store(WHITE_DEGREE,BLACK_DEGREE,(problems,relaxations,restrictions),"C")
 
 
 problems,relaxations,restrictions = import_data_set(WHITE_DEGREE,BLACK_DEGREE,"UC")
-start = timer()
 classify(problems,relaxations,restrictions)
-print(timer()-start)
