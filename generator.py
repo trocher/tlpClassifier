@@ -7,6 +7,7 @@ from joblib import Parallel, delayed
 from problem_set import Problem_set
 import time
 import multiprocessing
+from tqdm import tqdm
 DEBUG = True
 #DEBUG = False
 
@@ -43,7 +44,6 @@ def generate(white_degree, black_degree):
     #    store_RE_problem(elem)
 
     print("Computing relaxations and restrictions ...")
-    #for elem in tqdm(problems):
 
     def processInput(elem):
         relaxations,restrictions = set(),set()
@@ -61,8 +61,8 @@ def generate(white_degree, black_degree):
 
     t0= time.time()
     num_cores = multiprocessing.cpu_count()
-    #values = Parallel(n_jobs=num_cores)(delayed(processInput)(problems_list[i]) for i in tqdm(range(len(problems_list))))
-    values = [processInput(elem) for elem in problems_list]
+    values = Parallel(n_jobs=num_cores)(delayed(processInput)(problems_list[i]) for i in tqdm(range(len(problems_list))))
+    #values = [processInput(elem) for elem in problems_list]
     print(time.time()-t0)
     relaxations = [x for (x,y) in values]
     restrictions = [y for (x,y) in values]
