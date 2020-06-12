@@ -3,10 +3,8 @@ import sys, getopt
 from Tools import edge_3_labelling,powerset
 from Problem import Problem
 from FileHelp import data_name, store
-from joblib import Parallel, delayed
 from problem_set import Problem_set
 import time
-import multiprocessing
 from tqdm import tqdm
 DEBUG = True
 #DEBUG = False
@@ -60,20 +58,23 @@ def generate(white_degree, black_degree):
 
 
     t0= time.time()
-    num_cores = multiprocessing.cpu_count()
-    #values = Parallel(n_jobs=num_cores)(delayed(processInput)(problems_list[i]) for i in tqdm(range(len(problems_list))))
-    values = [processInput(elem) for elem in tqdm(problems_list)]
-    print(time.time()-t0)
-    relaxations = [x for (x,y) in values]
-    restrictions = [y for (x,y) in values]
+    #values = [processInput(elem) for elem in tqdm(problems_list)]
 
-    relaxations_dict = dict(zip(problems_list, relaxations))
-    relaxations_dict = dict(zip(problems_list, restrictions))
+    relaxations_dict = dict()
+    restrictions_dict = dict()
+    for problem in problems:
+        a,b = processInput(problem)
+        relaxations_dict[problem] = a
+        restrictions_dict[problem] = b
 
-    t0= time.time()
-    #for elem in problems:
-    #    processInput(elem)
     print(time.time()-t0)
+    
+    #relaxations = [x for (x,y) in values]
+    #restrictions = [y for (x,y) in values]
+#
+    #relaxations_dict = dict(zip(problems_list, relaxations))
+    #relaxations_dict = dict(zip(problems_list, restrictions))
+
     return (set(problems),relaxations_dict,restrictions_dict)
 
 def main(argv):
