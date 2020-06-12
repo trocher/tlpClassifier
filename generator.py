@@ -61,8 +61,8 @@ def generate(white_degree, black_degree):
 
     t0= time.time()
     num_cores = multiprocessing.cpu_count()
-    values = Parallel(n_jobs=num_cores)(delayed(processInput)(problems_list[i]) for i in tqdm(range(len(problems_list))))
-    #values = [processInput(elem) for elem in problems_list]
+    #values = Parallel(n_jobs=num_cores)(delayed(processInput)(problems_list[i]) for i in tqdm(range(len(problems_list))))
+    values = [processInput(elem) for elem in tqdm(problems_list)]
     print(time.time()-t0)
     relaxations = [x for (x,y) in values]
     restrictions = [y for (x,y) in values]
