@@ -7,7 +7,7 @@ import Tools
 from Algorithms import constraint_reduction,redundancy_algorithm, greedy4Coloring,round_eliminator_ub,cover_map_1,log_test, round_eliminator_lb
 from FileHelp import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
-from TwoLabelsClassifier import getComplexityOf,constraints_to_bitvector_tuple
+from TwoLabelsClassifier import get_complexity_of,constraints_to_bitvector_tuple
 from Input import ITERATED_LOGARITHMIC, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
 
 WHITE_DEGREE = 2
@@ -51,13 +51,13 @@ def unsolvable_criteria(problem):
 def two_labels_criteria(problem):
     # Problems that are 2 labelling problems
     if len(problem.alphabet()) < 3 and len(problem.white_constraint) > 0 and len(problem.black_constraint) > 0:
-        problem.set_complexity(getComplexityOf(*constraints_to_bitvector_tuple(problem.white_constraint,problem.black_constraint,problem.alphabet(),WHITE_DEGREE,BLACK_DEGREE)))
+        problem.set_complexity(get_complexity_of(*constraints_to_bitvector_tuple(problem.white_constraint,problem.black_constraint,problem.alphabet(),WHITE_DEGREE,BLACK_DEGREE)))
         return
     # Redundancy of a label
     if problem.alphabet_size() == 3:
         tmp = redundancy_algorithm(problem.white_constraint,problem.black_constraint)
         if tmp != None:
-            problem.set_complexity(getComplexityOf(*constraints_to_bitvector_tuple(tmp[0],tmp[1],tmp[2],WHITE_DEGREE,BLACK_DEGREE)))
+            problem.set_complexity(get_complexity_of(*constraints_to_bitvector_tuple(tmp[0],tmp[1],tmp[2],WHITE_DEGREE,BLACK_DEGREE)))
 
 def round_eliminator_ub_criteria(problem):
     upper_bound = round_eliminator_ub(problem, 5,6)
@@ -127,10 +127,6 @@ def classify(problems,relaxations,restrictions):
                 LBSubset = {x for x in problems if x.lower_bound == complexity}
                 compute_relaxations(problems, UBSubset,complexity,relaxations)
                 compute_restrictions(problems, LBSubset,complexity,restrictions)
-
-
-    classifiedSubset = {x for x in problems if x.get_complexity() == Complexity.Unclassified and x.lower_bound == Complexity.Constant}
-    
     
     for complexity in Complexity:
         classifiedSubset = {x for x in problems if x.get_complexity() == complexity}

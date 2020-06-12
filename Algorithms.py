@@ -65,15 +65,14 @@ def greedy4Coloring(problem):
     if white == problem.white_constraint and black.issubset(problem.black_constraint) and len(problem.black_constraint) > 3:
         return True
 
-def round_eliminator_ub(problem, iter, iterations):
+def round_eliminator_ub(problem, iterations, labels):
     file_name = str(hash(problem))
     print(file_name)
-    result_b = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_b.txt','--iter',str(iterations),'--labels','4'],stdout=subprocess.PIPE, text=True)
-    result_w = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_w.txt','--iter',str(iterations),'--labels','4'],stdout=subprocess.PIPE, text=True)
+    result_b = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_b.txt','--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
+    result_w = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_w.txt','--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
     if not result_b.stdout and not result_w.stdout:
         return -1
     else :
-        print("hellowww")
         def get_upper_bound(result):
             return int(re.search(r'\d+', result.split('\n')[1]).group())
         w = 1000

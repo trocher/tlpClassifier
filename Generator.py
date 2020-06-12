@@ -1,20 +1,17 @@
-import itertools
+#!/usr/bin/python3
+import sys, getopt
 from Tools import edge_3_labelling,powerset
 from Problem import Problem
 from FileHelp import data_name, store
-from timeit import default_timer as timer
-import time
 from tqdm import tqdm
 from joblib import Parallel, delayed
+from problem_set import Problem_set
+import time
 import multiprocessing
-
-WHITE_DEGREE = 2
-BLACK_DEGREE = 3
-
 DEBUG = True
 #DEBUG = False
 
-def store_RE_problem(problem):
+def store_RE_problem(problem,white_degree,black_degree):
         def mapping_function(configuration):
             return "A "*configuration[2]+"B "*configuration[1]+"C "*configuration[0]+"\n"
         w = "".join(map(mapping_function,problem.white_constraint))
@@ -24,8 +21,8 @@ def store_RE_problem(problem):
             f= open(name,"w+")
             f.write(active + "\n" + passive + "\n")
             f.close()
-        write_in_file_RE("data/problems_RE/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + str(hash(problem)) + "_w.txt",w,b)
-        write_in_file_RE("data/problems_RE/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + str(hash(problem)) + "_b.txt",b,w)
+        write_in_file_RE("data/problems_RE/" + str(white_degree) + "_" + str(black_degree) + "/" + str(hash(problem)) + "_w.txt",w,b)
+        write_in_file_RE("data/problems_RE/" + str(white_degree) + "_" + str(black_degree) + "/" + str(hash(problem)) + "_b.txt",b,w)
         
 # Return the set of all characteristics problems with the given degrees
 def generate(white_degree, black_degree):
@@ -47,31 +44,68 @@ def generate(white_degree, black_degree):
     #    store_RE_problem(elem)
 
     print("Computing relaxations and restrictions ...")
-    num_cores = multiprocessing.cpu_count()
     #for elem in tqdm(problems):
 
-    def processInput(elem):
+    def processInput(elem,problems):
         relaxations,restrictions = set(),set()
         equivalent_set = elem.equivalent_problems_instance()
         for other in problems:
             for x in equivalent_set:
                 if elem != other :
-                    if x.is_restriction(other) and other in problems:
+                    if x.is_restriction(other) :
                         relaxations.add(other)
-                    if x.is_relaxation(other) and other in problems:
+                    if x.is_relaxation(other) :
                         restrictions.add(other)
         return (relaxations,restrictions)
     
-
-    values = Parallel(n_jobs=num_cores)(delayed(processInput)(i) for i in tqdm(problems_list))
+    t0= time.time()
+    num_cores = multiprocessing.cpu_count()
+    values = Parallel(n_jobs=num_cores)(delayed(processInput)(problems_list[i],problems) for i in range(len(problems_list)))
+    print(time.time()-t0)
     relaxations, restrictions = map(list, zip(*values))
 
     relaxations_dict = dict(zip(problems_list, relaxations))
     relaxations_dict = dict(zip(problems_list, restrictions))
 
-    for elem in tqdm(problems):
-        processInput(elem)
+    t0= time.time()
+    for elem in problems:
+        processInput(elem,problems)
+    print(time.time()-t0)
     return (set(problems),relaxations_dict,restrictions_dict)
 
-p = generate(WHITE_DEGREE,BLACK_DEGREE)
-store(WHITE_DEGREE,BLACK_DEGREE,p,"UC")
+def main(argv):
+    white_degree = -1
+    black_degree = -1
+    try:
+        opts, args = getopt.getopt(argv,"hw:b:",["wdegree=","bdegree="])
+    except getopt.GetoptError:
+        print ('generator.py -w <whitedegree> -b <blackdegree>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('generator.py -w <whitedegree> -b <blackdegree>')
+            sys.exit()
+        elif opt in ("-w", "--wdegree"):
+            try :
+                white_degree = int(arg)
+            except ValueError:
+                print("The white degree is not an int")
+                sys.exit(1)
+        elif opt in ("-b", "--bdegree"):
+            try :
+                black_degree = int(arg)
+            except ValueError:
+                print("The black degree is not an int")
+                sys.exit(1)
+
+    if (white_degree <= 1 or black_degree <= 1):
+        print("A degree must be superior or equal to 2")
+        sys.exit(1)
+        
+    min_degree = min([white_degree,black_degree])
+    max_degree = max([white_degree,black_degree])
+    p = generate(min_degree,max_degree)
+    store(min_degree,max_degree,p,Problem_set.Unclassified)
+
+if __name__ == "__main__":
+   main(sys.argv[1:])

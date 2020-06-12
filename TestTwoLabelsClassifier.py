@@ -1,12 +1,12 @@
 import unittest
 
-from TwoLabelsClassifier import getComplexityOf
+from TwoLabelsClassifier import get_complexity_of
 from Complexity import Complexity
 from bitarray import bitarray
 from random import *
 import numpy as np
 def complexity(that):
-    return getComplexityOf(*(bitarray(that[0]),bitarray(that[1])))
+    return get_complexity_of(*(bitarray(that[0]),bitarray(that[1])))
 def random_string(length):
     return ''.join(str(x) for x in np.random.randint(2,size = length))
 

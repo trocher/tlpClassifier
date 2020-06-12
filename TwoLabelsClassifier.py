@@ -38,7 +38,7 @@ def is_global(white_constraint,black_constraint,white_degree,black_degree):
         return True
     return False
     
-def getComplexityOf(white_constraint,black_constraint):
+def get_complexity_of(white_constraint,black_constraint):
     white_d = len(white_constraint)-1
     black_d = len(black_constraint)-1
     assert(white_d>=2 and black_d>=2)

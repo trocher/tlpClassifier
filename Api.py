@@ -6,6 +6,7 @@ from timeit import default_timer as timer
 from Tools import alpha_to_problem
 from Algorithms import local_neighborhood
 from Input import LOGARITHMIC_LOWER_BOUND
+
 def get_problem(alpha_problem, problems):
     problem = alpha_to_problem(alpha_problem)
     for elem in problems:
@@ -57,9 +58,6 @@ def get_UC_with_x_UC_relaxations(complexity, val, problems, relaxations, restric
         if elem.get_complexity() == Complexity.Unclassified and elem.lower_bound == Complexity.Logarithmic and numpy.count_nonzero([x.get_complexity() == Complexity.Unclassified and x.lower_bound == Complexity.Logarithmic for x in relaxations[elem]]) > val:
             print(elem)
 
-def get_constant_not_RE(problems):
-    return {problem for problem in problems if problem.get_complexity() == Complexity.Constant and problem.constant_upper_bound == 1000}
-
 def get_upper_bounds_constant_problems(problems):
     res = dict()
     for problem in problems:
@@ -76,17 +74,3 @@ black_constraint = {'AAC', 'BBB'}
 alpha_problem = (white_constraint,black_constraint,2,3)
 #print(get_problem(alpha_problem,problems))
 print(get_upper_bounds_constant_problems(problems))
-#for problem in problems:
-#    if hash(problem) == 422989813150208003:
-#        print(problem)
-#for problem in get_unclassified_problems(problems, relaxations, restrictions):
-#    if len(get_unclassified_relaxations_of(problem,problems,relaxations,restrictions)) != 0 and any([x in get_unclassified_problems_without_relaxations(problems,relaxations,restrictions) for x in get_unclassified_relaxations_of(problem,problems,relaxations,restrictions)]) and not all([x in get_unclassified_problems_without_relaxations(problems,relaxations,restrictions) for x in get_unclassified_relaxations_of(problem,problems,relaxations,restrictions)]):
-#        problem.print_RE()
-#for problem in problems:
-#    if (problem.get_complexity() == Complexity.Constant and problem.constant_upper_bound == 1):
-#        print(problem)
-#for problem in get_unclassified_problems_without_restrictions(problems,relaxations,restrictions):
-#    print(problem)
-#k = {x for x in get_relaxations_of(alpha_problem,problems,relaxations,restrictions) if x.get_complexity() == Complexity.Logarithmic}
-#for elem in k:
-#    print(elem)

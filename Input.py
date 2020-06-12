@@ -16,7 +16,7 @@ ITERATED_LOGARITHMIC = [
     2,3)
 ]
 
-LOGARITHMIC2 = [
+LOGARITHMIC_TIGHT = [
 
     # 3 vertex coloring on latex
     ({'AB', 'AC', 'BC'},
@@ -27,20 +27,12 @@ LOGARITHMIC2 = [
     ({'AA', 'BB', 'CC'},
     {'ABC'},2,3),
 
-
-    # 2 partial 2 coloring
     ({'AB','CC'},
     {'AAA','BBB','AAC','BBC'},2,3)
-
 ]
-LOGARITHMIC = [
-    #########
-    # A B 
-    # C C
-    #
-    # C C B 
-    # A C ABC
+LOGARITHMIC_UPPER_BOUND = [
 
+MISS 1
 
     ({'AB', 'CC'},
     {'CCB', 'ACC'},
