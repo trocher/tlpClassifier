@@ -100,7 +100,7 @@ def classify(problems,relaxations,restrictions):
 
     partially_classify(unsolvable_criteria)
     partially_classify_debug(two_labels_criteria)
-    partially_classify(round_eliminator_ub_criteria)
+    partially_classify_unclassified_or_constant(round_eliminator_ub_criteria)
     #partially_classify(round_eliminator_lb_criteria)
     partially_classify_debug(greedy_4_coloring_test) #done
     partially_classify_debug(cover_map_test)
@@ -165,7 +165,7 @@ def main(argv):
     min_degree = min([white_degree,black_degree])
     max_degree = max([white_degree,black_degree])
 
-    problems,relaxations,restrictions = import_data_set(min_degree,max_degree,Problem_set.Unclassified)
+    problems,relaxations,restrictions = import_data_set(min_degree,max_degree,Problem_set.Classified)
     print("Starting classification (" + str(len(problems)) + " problems)...")
     classify(problems,relaxations,restrictions)
 

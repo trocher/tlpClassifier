@@ -2,7 +2,9 @@ from complexity import Complexity, complexity_name
 from enum import Enum
 import itertools
 from algorithms import constraint_reduction
+from tools import alpha_to_num_constraint,num_to_alpha_configuration
 LABELS = [0,1,2]
+
 class Constraints(Enum):
     White = 0
     Black = 1 
@@ -10,10 +12,6 @@ class Constraints(Enum):
 class Problem:
 
     # Create a Problem
-    # whiteConstraint is a set of all the configurations (3-tuples) allowed for the white nodes
-    # blackConstraint is a set of all the configurations (3-tuples) allowed for the black nodes
-    # whiteDegree an int, the degree of the white nodes
-    # blackDegree an int, the degree of the black nodes
     def __init__(self, white_constraint, black_constraint, white_degree, black_degree):
         self.white_constraint,self.black_constraint = map(lambda x : frozenset(x),constraint_reduction(frozenset(white_constraint),frozenset(black_constraint)))
         self.white_degree = white_degree
@@ -31,10 +29,8 @@ class Problem:
 
     # Print the main characteristics of the problem in the console
     def __repr__(self):
-        def mapping_function(configuration):
-            return "A"*configuration[0]+"B"*configuration[1]+"C"*configuration[2]
-        w = ", ".join(map(mapping_function,self.white_constraint))
-        b = ", ".join(map(mapping_function,self.black_constraint))
+        w = ", ".join(map(num_to_alpha_configuration,self.white_constraint))
+        b = ", ".join(map(num_to_alpha_configuration,self.black_constraint))
         res = w + "\n" + b + "\n"
         if(self.get_complexity() == Complexity.Unclassified):
             return  res + "Lower bound : "+ complexity_name[self.lower_bound] + "\n" + "Upper bound : " + complexity_name[self.upper_bound] + "\n"
@@ -45,31 +41,26 @@ class Problem:
         return res
 
     # Write the main characteristics of the problem in a file
-    # io is the stream where the problem should be written
     def write_in_file(self, io):
         io.write(self.__repr__()+"\n")
-
-
 
     def re_format(self):
         def mapping_function(configuration):
             return "A "*configuration[0]+"B "*configuration[1]+"C "*configuration[2]+"\n"
-        w = "".join(map(mapping_function,self.white_constraint))
-        b = "".join(map(mapping_function,self.black_constraint))
-        return(w + "\n" + b)
 
-    def write_in_file_RE(self, name):
-        f= open(name,"w+")
-        def mapping_function(configuration):
-            return "A "*configuration[0]+"B "*configuration[1]+"C "*configuration[2]+"\n"
         w = "".join(map(mapping_function,self.white_constraint))
         b = "".join(map(mapping_function,self.black_constraint))
-        #print(w + "\n" + b + "\n\n")
-        f.write(w + "\n" + b + "\n")
-        f.close()
+        return(w,b)
+
+    def re_format_white(self):
+        w,b = self.re_format()
+        return(w + '\n'+b)
+
+    def re_format_black(self):
+        w,b = self.re_format()
+        return(b + '\n'+w)
 
     # Return the alphabet of the given constraint
-    # constraint is either Constraints.Black or Constraints.Black
     def constraint_alphabet(self, constraint):
         alphabet = set()
         config = self.black_constraint if constraint == Constraints.Black else self.white_constraint
@@ -80,7 +71,6 @@ class Problem:
         return alphabet 
 
     # Return the size of the alphabet of the given constraint
-    # constraint is either Constraints.Black or Constraints.Black
     def constraint_size(self, constraint):
         return len(self.black_constraint if constraint == Constraints.Black else self.white_constraint)
 
@@ -91,31 +81,9 @@ class Problem:
     # Return the the alphabet size of the problem
     def alphabet_size(self):
         return len(self.alphabet())
-
-    # Check if the current problem is a restriction of the given problem
-    def is_restriction(self, other):
-        return self.white_constraint.issubset(other.white_constraint) and self.black_constraint.issubset(other.black_constraint)
-   
-    # Check if the current problem is a relaxation of the given problem
-    def is_relaxation(self, other):
-        return other.is_restriction(self)
-
-    def is_relaxation_of_at_least_1(self, problemSet):   
-        for elem in problemSet:
-            if self.is_relaxation(elem):
-                return True
-        return False
-
-    def is_restriction_of_at_least_1(self, problemSet):
-        for elem in problemSet:
-            if self.is_restriction(elem):
-                return True
-        return False
     
     # Set a lower bound for the complexity of the problem
     def set_lower_bound(self,complexity):
-            # Inputs:
-        #       - complexity : the new lower bound to the problem
         if self.upper_bound.value < complexity.value:
             print("Error, trying to put a lower bound (", complexity, ") bigger than the current upper bound (", self.upper_bound , ")")
             print(self)
@@ -127,8 +95,6 @@ class Problem:
 
     # Set an upper bound for the complexity of the problem
     def set_upper_bound(self,complexity):
-        # Inputs:
-        #       - complexity : the new upper bound for the problem
         if self.lower_bound.value > complexity.value:
             print("Error, trying to put a upper bound (", complexity, ") lower than the current lower bound (", self.lower_bound , ")")
             print(self)
@@ -139,7 +105,6 @@ class Problem:
 
 
     # Set the complexity of the problem to the given complexity
-    # complexity, a Complexity
     def set_complexity(self,complexity):
         if self.lower_bound == self.upper_bound and self.lower_bound != Complexity.Unclassified and self.lower_bound != complexity:
             print("error a different complexity has already been assigned")
@@ -152,7 +117,6 @@ class Problem:
 
     # Return a list of equivalents problem to the given problem as constraints tuple
     def equivalent_problems(self):
-        #x = constraint_reduction(self.white_constraint,self.black_constraint)
         x = (self.white_constraint,self.black_constraint)
         problemList = [[[ (t[a],t[b],t[c]) for t in x] for x in x] for a,b,c in itertools.permutations([0,1,2])]
         if self.black_degree == self.white_degree:
@@ -176,3 +140,9 @@ class Problem:
     # Return true if and only if the given problem is the unique characteristic problem of all of its equivalents problems
     def is_characteristic_problem(self):
         return self.get_characteristic_problem() == self
+
+# Return an instance of a problem given an problem in an alpha form
+def alpha_to_problem(alpha_problem):
+    white_degree = alpha_problem[2]
+    black_degree = alpha_problem[3]
+    return Problem(alpha_to_num_constraint(alpha_problem[0]),alpha_to_num_constraint(alpha_problem[1]),alpha_problem[2],alpha_problem[3]).get_characteristic_problem()

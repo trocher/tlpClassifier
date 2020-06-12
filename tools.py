@@ -1,5 +1,4 @@
 import itertools
-from problem import Problem
 
 # Return the list of possible 3-labellings of node with a given degre
 def edge_3_labelling(degree):
@@ -20,9 +19,3 @@ def alpha_to_num_configuration(alpha_configuration):
 # Transform a set of configurations from a alpha form to a numerical form
 def alpha_to_num_constraint( alpha_constraint):
     return [alpha_to_num_configuration(x) for x in alpha_constraint]
-
-# Return an instance of a problem given an problem in an alpha form
-def alpha_to_problem(alpha_problem):
-    white_degree = alpha_problem[2]
-    black_degree = alpha_problem[3]
-    return Problem(alpha_to_num_constraint(alpha_problem[0]),alpha_to_num_constraint(alpha_problem[1]),alpha_problem[2],alpha_problem[3]).get_characteristic_problem()

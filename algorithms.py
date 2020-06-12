@@ -1,5 +1,6 @@
 import numpy as np
 import itertools, tempfile, re, subprocess,os
+import problem
 LABELS = set([0,1,2])
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
@@ -65,24 +66,32 @@ def greedy4Coloring(problem):
         return True
 
 def round_eliminator_constant(problem):
-    iter_label = [(20,3),(7,4),(5,5),(4,6)]
+    iter_label = [(20,3),(8,4),(4,5),(4,6)]
     #for i in range(len(iter_label)):
     for i in range(1):
-        ub = round_eliminator(problem,'autoub', iter_label[i][0], iter_label[i][1])
+        ub = round_eliminator(problem,'autoub', iter_label[1][0], iter_label[1][1])
         if ub >= 0:
             if i > 0:
                 print(" done in : ",i," with a ub of : ",ub)
             return ub
     return -1
 def round_eliminator(problem, function, iterations, labels):
-    with tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file:
-        temp_file.write(problem.re_format())
-        temp_file.flush()
-        result_b = subprocess.run([SERVER_DIR,function,'-f',temp_file.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True).stdout
-        result_w = subprocess.run([SERVER_DIR,function,'-f',temp_file.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True).stdout
+    with tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_w, tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_b:
+        
+        temp_file_b.write(problem.re_format_black())
+        temp_file_w.write(problem.re_format_white())
+
+        temp_file_b.flush()
+        temp_file_w.flush()
+
+        result_b = subprocess.run([SERVER_DIR,function,'-f',temp_file_b.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True).stdout
+        result_w = subprocess.run([SERVER_DIR,function,'-f',temp_file_w.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True).stdout
+        
         if not result_b and not result_w:
             return -1
         else :
+            if not result_b or not result_w:
+                print(problem)
             def get_value(result):
                 search_string = 'Upper bound of '
                 index = result.find(search_string)
