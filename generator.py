@@ -6,8 +6,6 @@ from FileHelp import data_name, store
 from problem_set import Problem_set
 import time
 from tqdm import tqdm
-DEBUG = True
-#DEBUG = False
 
 def store_RE_problem(problem,white_degree,black_degree):
         def mapping_function(configuration):
@@ -30,20 +28,10 @@ def generate(white_degree, black_degree):
     problems = set([Problem(a,b,white_degree,black_degree) for (a,b) in problems_tuple if Problem(a,b,white_degree,black_degree).is_characteristic_problem()])
     number_of_problems = len(problems)
     problems_list = list(problems)
-    if DEBUG:
-        print("Number of White Configurations :",len(white_configurations))
-        print("Number of Black Configurations :",len(black_configurations))
-        print("Number of White Constraints :",len(white_constraints))
-        print("Number of Black Constraints :",len(black_constraints))
-    relaxations_dict, restrictions_dict = dict(),dict()
-
-    #print("Storing the problems in the RE format ...")
-    #for elem in tqdm(problems):
-    #    store_RE_problem(elem)
 
     print("Computing relaxations and restrictions ...")
 
-    def processInput(elem):
+    def process_problem(elem):
         relaxations,restrictions = set(),set()
         equivalent_set = elem.equivalent_problems_instance()
         for other in problems:
@@ -54,26 +42,17 @@ def generate(white_degree, black_degree):
                     if x.is_relaxation(other):
                         restrictions.add(other)
         return (relaxations,restrictions)
-    
-
 
     t0= time.time()
-    #values = [processInput(elem) for elem in tqdm(problems_list)]
 
-    relaxations_dict = dict()
-    restrictions_dict = dict()
+    relaxations_dict, restrictions_dict = dict(),dict()
+
     for problem in problems:
-        a,b = processInput(problem)
+        a,b = process_problem(problem)
         relaxations_dict[problem] = a
         restrictions_dict[problem] = b
 
     print(time.time()-t0)
-    
-    #relaxations = [x for (x,y) in values]
-    #restrictions = [y for (x,y) in values]
-#
-    #relaxations_dict = dict(zip(problems_list, relaxations))
-    #relaxations_dict = dict(zip(problems_list, restrictions))
 
     return (set(problems),relaxations_dict,restrictions_dict)
 
@@ -110,6 +89,10 @@ def main(argv):
     max_degree = max([white_degree,black_degree])
     p = generate(min_degree,max_degree)
     store(min_degree,max_degree,p,Problem_set.Unclassified)
+
+    #print("Storing the problems in the RE format ...")
+    #for elem in tqdm(p[0]):
+    #    store_RE_problem(elem)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
