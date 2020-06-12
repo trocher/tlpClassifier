@@ -4,9 +4,8 @@ from problem import Problem
 from complexity import Complexity
 from timeit import default_timer as timer
 from tools import alpha_to_problem
-from algorithms import local_neighborhood
 from input import LOGARITHMIC_LOWER_BOUND
-
+from problem_set import Problem_set
 def get_problem(alpha_problem, problems):
     problem = alpha_to_problem(alpha_problem)
     for elem in problems:
@@ -68,9 +67,12 @@ def get_upper_bounds_constant_problems(problems):
             res[ub] = res.get(ub,0) + 1
     return res
 
-problems,relaxations,restrictions = import_data_set(2, 3,"C")
+problems,relaxations,restrictions = import_data_set(2, 3,Problem_set.Classified)
 white_constraint = {'BC','AA'}
 black_constraint = {'AAC', 'BBB'}
 alpha_problem = (white_constraint,black_constraint,2,3)
 #print(get_problem(alpha_problem,problems))
-print(get_upper_bounds_constant_problems(problems))
+
+for problem in problems:
+    if hash(problem) == 4314598173518037042:
+        print(problem)

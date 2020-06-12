@@ -1,11 +1,12 @@
 #!/usr/bin/python3
+import sys, getopt
 from problem import Problem,Constraints
 from complexity import Complexity,complexity_name
 from tqdm import tqdm
 import pickle
 import tools
-from algorithms import constraint_reduction,redundancy_algorithm, greedy4Coloring,round_eliminator_ub,cover_map_1,log_test, round_eliminator_lb
-from fileHelp import import_data_set, problems_to_file,add_degree_suffix,store
+from algorithms import constraint_reduction,redundancy_algorithm, greedy4Coloring,round_eliminator_constant,cover_map_1,log_test, round_eliminator_lb
+from file_help import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
 from two_labels_classifier import get_complexity_of,constraints_to_bitvector_tuple
 from input import ITERATED_LOGARITHMIC, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
@@ -13,11 +14,6 @@ from problem_set import Problem_set
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
 LABELS = frozenset([0,1,2])
-
-DEBUG = True
-#DEBUG = False
-STORE = True
-#STORE = False
 
 # Classify the problems of the given set according to the given complexity
 def compute_restriction_relaxations(problems, that, complexity,restrictions,relaxations):
@@ -60,7 +56,7 @@ def two_labels_criteria(problem):
             problem.set_complexity(get_complexity_of(*constraints_to_bitvector_tuple(tmp[0],tmp[1],tmp[2],WHITE_DEGREE,BLACK_DEGREE)))
 
 def round_eliminator_ub_criteria(problem):
-    upper_bound = round_eliminator_ub(problem, 5,6)
+    upper_bound = round_eliminator_constant(problem)
     if upper_bound >= 0:
         problem.set_complexity(Complexity.Constant)
         problem.constant_upper_bound = min(problem.constant_upper_bound,upper_bound)
@@ -94,14 +90,18 @@ def classify(problems,relaxations,restrictions):
     def partially_classify(function):
         for problem in tqdm(unclassified_problems(problems)):
             function(problem)
+    def partially_classify_RE(function):
+        for problem in tqdm(unclassified_problems(problems)):
+            function(problem)
+
     def partially_classify_debug(function):
         for problem in tqdm(solvable_problems(problems)):
             function(problem)
 
     partially_classify(unsolvable_criteria)
-    #partially_classify(round_eliminator_ub_criteria)
-    #partially_classify(round_eliminator_lb_criteria)
     partially_classify_debug(two_labels_criteria)
+    partially_classify(round_eliminator_ub_criteria)
+    #partially_classify(round_eliminator_lb_criteria)
     partially_classify_debug(greedy_4_coloring_test) #done
     partially_classify_debug(cover_map_test)
     partially_classify_debug(log_test_test)
@@ -128,14 +128,55 @@ def classify(problems,relaxations,restrictions):
                 compute_relaxations(problems, UBSubset,complexity,relaxations)
                 compute_restrictions(problems, LBSubset,complexity,restrictions)
     
+def main(argv):
+    white_degree = -1
+    black_degree = -1
+    s = False
+    try:
+        opts, args = getopt.getopt(argv,"hw:b:s",["wdegree=","bdegree=",'store'])
+    except getopt.GetoptError:
+        print ('classifier.py -w <whitedegree> -b <blackdegree>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('classifier.py -w <whitedegree> -b <blackdegree>')
+            print('-s to store the differents ')
+            sys.exit()
+        elif opt in ("-w", "--wdegree"):
+            try :
+                white_degree = int(arg)
+            except ValueError:
+                print("The white degree is not an int")
+                sys.exit(1)
+        elif opt in ("-b", "--bdegree"):
+            try :
+                black_degree = int(arg)
+            except ValueError:
+                print("The black degree is not an int")
+                sys.exit(1)
+        elif opt in ("-s","--store"):
+            s = True
+            print("aaa")
+
+    if (white_degree <= 1 or black_degree <= 1):
+        print("A degree must be superior or equal to 2")
+        sys.exit(1)
+        
+    min_degree = min([white_degree,black_degree])
+    max_degree = max([white_degree,black_degree])
+
+    problems,relaxations,restrictions = import_data_set(min_degree,max_degree,Problem_set.Unclassified)
+    print("Starting classification (" + str(len(problems)) + " problems)...")
+    classify(problems,relaxations,restrictions)
+
+    store(WHITE_DEGREE,BLACK_DEGREE,(problems,relaxations,restrictions),Problem_set.Classified)
+
     for complexity in Complexity:
         classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
-        if DEBUG:
-            print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
-        if STORE:
+        print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
+        if store:
             problems_to_file("output/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
-    #store(WHITE_DEGREE,BLACK_DEGREE,(problems,relaxations,restrictions),Problem_set.Classified)
 
 
-problems,relaxations,restrictions = import_data_set(WHITE_DEGREE,BLACK_DEGREE,Problem_set.Unclassified)
-classify(problems,relaxations,restrictions)
+if __name__ == "__main__":
+   main(sys.argv[1:])

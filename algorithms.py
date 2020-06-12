@@ -1,10 +1,9 @@
 import numpy as np
-import subprocess
-import re
-import itertools
+import itertools, tempfile, re, subprocess,os
 LABELS = set([0,1,2])
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
+SERVER_DIR = os.path.dirname(os.path.realpath(__file__))+'/server'
 
 # Return all the configurations of the given constraint that does not contains any of the given labels
 def configurations_without(constraint, that):
@@ -65,23 +64,36 @@ def greedy4Coloring(problem):
     if white == problem.white_constraint and black.issubset(problem.black_constraint) and len(problem.black_constraint) > 3:
         return True
 
-def round_eliminator_ub(problem, iterations, labels):
-    file_name = str(hash(problem))
-    print(file_name)
-    result_b = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_b.txt','--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
-    result_w = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autoub','-f','data/problems_RE/2_3/'+file_name + '_w.txt','--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
-    if not result_b.stdout and not result_w.stdout:
-        return -1
-    else :
-        def get_upper_bound(result):
-            return int(re.search(r'\d+', result.split('\n')[1]).group())
-        w = 1000
-        b = 1000
-        if result_w.stdout:
-            w = get_upper_bound(result_w.stdout)
-        if result_b.stdout:
-            b = get_upper_bound(result_b.stdout)
-        return min(w,b)
+def round_eliminator_constant(problem):
+    iter_label = [(20,3),(7,4),(5,5),(4,6)]
+    #for i in range(len(iter_label)):
+    for i in range(1):
+        ub = round_eliminator(problem,'autoub', iter_label[i][0], iter_label[i][1])
+        if ub >= 0:
+            if i > 0:
+                print(" done in : ",i," with a ub of : ",ub)
+            return ub
+    return -1
+def round_eliminator(problem, function, iterations, labels):
+    with tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file:
+        temp_file.write(problem.re_format())
+        temp_file.flush()
+        result_b = subprocess.run([SERVER_DIR,function,'-f',temp_file.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True).stdout
+        result_w = subprocess.run([SERVER_DIR,function,'-f',temp_file.name,'--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True).stdout
+        if not result_b and not result_w:
+            return -1
+        else :
+            def get_value(result):
+                search_string = 'Upper bound of '
+                index = result.find(search_string)
+                return int(result[len(search_string)+index])
+            w = 444
+            b = 444
+            if result_w:
+                w = get_value(result_w)
+            if result_b:
+                b = get_value(result_b)
+            return min(w,b)
 
 def round_eliminator_lb(problem,iterations,labels):
     file_name = str(hash(problem))

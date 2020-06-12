@@ -38,6 +38,7 @@ def is_global(white_constraint,black_constraint,white_degree,black_degree):
         return True
     return False
     
+# Given 2 bitarrays of length at least 2, return the complexity of the corresponding binary labelling problem
 def get_complexity_of(white_constraint,black_constraint):
     white_d = len(white_constraint)-1
     black_d = len(black_constraint)-1
@@ -50,7 +51,11 @@ def get_complexity_of(white_constraint,black_constraint):
         return Complexity.Global
     return Complexity.Logarithmic
 
+# Transform a problem that uses only two labels in 2 bitarrays.
 def constraints_to_bitvector_tuple(white_constraint,black_constraint,alphabet,white_degree,black_degree):
+    if not len(alphabet) < 3:
+        print("Error, the constraints have more than 2 labels")
+        return
     white = util.zeros(white_degree+1)
     black = util.zeros(black_degree+1)
     label = list(alphabet)[0]
@@ -59,5 +64,3 @@ def constraints_to_bitvector_tuple(white_constraint,black_constraint,alphabet,wh
     for configuration in black_constraint:
         black[configuration[label]] = 1
     return (white,black)
-
-#print(getComplexityOf(bitarray("101"),bitarray("0110")))

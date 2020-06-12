@@ -7,20 +7,6 @@ from problem_set import Problem_set
 import time
 from tqdm import tqdm
 
-def store_RE_problem(problem,white_degree,black_degree):
-        def mapping_function(configuration):
-            return "A "*configuration[2]+"B "*configuration[1]+"C "*configuration[0]+"\n"
-        w = "".join(map(mapping_function,problem.white_constraint))
-        b = "".join(map(mapping_function,problem.black_constraint))
-        
-        def write_in_file_RE(name, active, passive):
-            f= open(name,"w+")
-            f.write(active + "\n" + passive + "\n")
-            f.close()
-        write_in_file_RE("data/problems_RE/" + str(white_degree) + "_" + str(black_degree) + "/" + str(hash(problem)) + "_w.txt",w,b)
-        write_in_file_RE("data/problems_RE/" + str(white_degree) + "_" + str(black_degree) + "/" + str(hash(problem)) + "_b.txt",b,w)
-        
-# Return the set of all characteristics problems with the given degrees
 def generate(white_degree, black_degree):
     white_configurations, black_configurations = edge_3_labelling(white_degree),edge_3_labelling(black_degree)
     white_constraints, black_constraints = powerset(white_configurations),powerset(black_configurations)
@@ -89,10 +75,6 @@ def main(argv):
     max_degree = max([white_degree,black_degree])
     p = generate(min_degree,max_degree)
     store(min_degree,max_degree,p,Problem_set.Unclassified)
-
-    #print("Storing the problems in the RE format ...")
-    #for elem in tqdm(p[0]):
-    #    store_RE_problem(elem)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
