@@ -43,6 +43,10 @@ LOGARITHMIC_UPPER_BOUND = [
     {'BCC', 'ABB'},
     2,3),
 
+    ({'AB', 'CC'},
+    {'BCC', 'AAC'},
+    2,3),
+    
 # SOO done on latex
     ({'AC', 'BC'},
     {'ABC', 'BCC'},2,3),

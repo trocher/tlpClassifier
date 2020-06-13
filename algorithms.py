@@ -1,6 +1,8 @@
 import numpy as np
 import itertools, tempfile, re, subprocess,os
 import problem
+from time import time
+
 LABELS = set([0,1,2])
 WHITE_DEGREE = 2
 BLACK_DEGREE = 3
@@ -65,17 +67,6 @@ def greedy4Coloring(problem):
     if white == problem.white_constraint and black.issubset(problem.black_constraint) and len(problem.black_constraint) > 3:
         return True
 
-def round_eliminator_constant(problem):
-    iter_label = [(20,3),(10,4),(5,5)]
-    #for i in range(len(iter_label)):
-    for i in [1,2]:
-        ub = round_eliminator(problem,'autoub', iter_label[i][0], iter_label[i][1])
-        if ub >= 0:
-            if i > 0:
-                print(" done in : ",i," with a ub of : ",ub)
-            return ub
-    return -1
-
 def round_eliminator(problem, function, iterations, labels):
     with tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_w, tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_b:
         
@@ -90,12 +81,12 @@ def round_eliminator(problem, function, iterations, labels):
         if not result_b and not result_w:
             return -1
         else :
-            if not result_b or not result_w:
-                print(problem)
             def get_value(result):
-                search_string = 'Upper bound of '
-                index = result.find(search_string)
-                return int(result[len(search_string)+index])
+                for i in range(1000):
+                    search_string = 'Upper bound of ' + str(i)
+                    if result.find(search_string) != -1:
+                        return i
+                    return -1
             w = 444
             b = 444
             if result_w:
@@ -107,8 +98,8 @@ def round_eliminator(problem, function, iterations, labels):
 def round_eliminator_lb(problem,iterations,labels):
     file_name = str(hash(problem))
     print(file_name)
-    result_b = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autolb','-f','data/problems_RE/2_3/'+file_name + '_b.txt','--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
-    result_w = subprocess.run(['/Users/tanguy/Documents/tlpClassifier/server','autolb','-f','data/problems_RE/2_3/'+file_name + '_w.txt','--iter',str(iterations),'--labels',str(labels)],stdout=subprocess.PIPE, text=True)
+    result_b = subprocess.getoutput(SERVER_DIR + " " + function + ' -f ' + temp_file_b.name + ' --iter ' + str(iterations) +' --labels ' + str(labels))
+    result_w = subprocess.getoutput(SERVER_DIR + " " + function + ' -f ' + temp_file_w.name + ' --iter ' + str(iterations) +' --labels ' + str(labels))
     if not result_b.stdout and not result_w.stdout:
         return -1
     else :
@@ -127,35 +118,3 @@ def cover_map_1(white_constraint,black_constraint):
     w = set([(w0-b0,w1-b1,w2-b2) for (w0,w1,w2) in black_constraint for (b0,b1,b2) in white_constraint if w0-b0 >= 0 and w1-b1 >=0 and w2-b2>=0])
     b = set([(w0a+w0b,w1a+w1b,w2a+w2b) for (w0a,w1a,w2a) in w for (w0b,w1b,w2b) in w if (w0a+w0b,w1a+w1b,w2a+w2b) in white_constraint])
     return not b
-
-def log_test(white_constraint,black_constraint):
-    def num_to_alpha_configuration(num_configuration):
-        return "A"*num_configuration[0]+"B"*num_configuration[1]+"C"*num_configuration[2]
-
-    def alpha_to_num_configuration(alpha_configuration):
-        return (alpha_configuration.count('A'),alpha_configuration.count('B'),alpha_configuration.count('C'))
-
-    def can_be_neighbors(ordered_configuration_1,ordered_configuration_2,white_constraint):
-        zipped_configurations = list(zip(ordered_configuration_1,ordered_configuration_2))
-        return all([alpha_to_num_configuration(x) in white_constraint for x in zipped_configurations])
-
-    def c_ordered_configurations(a,b):
-        lst = [
-            (a[0],a[1],b[2]),
-            (a[0],b[1],b[2]),
-            (a[0],b[1],a[2]),
-            (b[0],a[1],b[2]),
-            (b[0],a[1],a[2]),
-            (b[0],b[1],a[2])
-        ]
-        return lst
-
-    black_c_alpha = [list(num_to_alpha_configuration(x)) for x in black_constraint]
-    black_c_ordered_alpha = list({x for lst in black_c_alpha for x in itertools.permutations(lst)})
-    for a in black_c_alpha:
-        y = [b for b in black_c_ordered_alpha if can_be_neighbors(a,b,white_constraint)]
-        for b in y:
-            c = c_ordered_configurations(a,b)
-            if all([any([can_be_neighbors(x,y,white_constraint) for y in black_c_ordered_alpha]) for x in c]):
-                return True
-    return False
