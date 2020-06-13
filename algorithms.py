@@ -66,9 +66,9 @@ def greedy4Coloring(problem):
         return True
 
 def round_eliminator_constant(problem):
-    iter_label = [(20,3),(9,4),(4,5),(4,6)]
+    iter_label = [(20,3),(12,4),(6,5),(4,6)]
     #for i in range(len(iter_label)):
-    for i in [1,2]:
+    for i in [1,2,3]:
         ub = round_eliminator(problem,'autoub', iter_label[i][0], iter_label[i][1])
         if ub >= 0:
             if i > 0:
