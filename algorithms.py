@@ -75,6 +75,7 @@ def round_eliminator_constant(problem):
                 print(" done in : ",i," with a ub of : ",ub)
             return ub
     return -1
+    
 def round_eliminator(problem, function, iterations, labels):
     with tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_w, tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_b:
         
@@ -86,7 +87,6 @@ def round_eliminator(problem, function, iterations, labels):
 
         result_b = subprocess.getoutput(SERVER_DIR + " " + function + ' -f ' + temp_file_b.name + ' --iter ' + str(iterations) +' --labels ' + str(labels))
         result_w = subprocess.getoutput(SERVER_DIR + " " + function + ' -f ' + temp_file_w.name + ' --iter ' + str(iterations) +' --labels ' + str(labels))
-        print(result_w)
         if not result_b and not result_w:
             return -1
         else :

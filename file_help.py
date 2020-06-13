@@ -20,8 +20,6 @@ def store(white_degree,black_degree,probems,classified):
         pickle.dump(probems, problem_file)
 
 # Store a given set of problems in a file
-# name, a string, the name of the file
-# that, the set of problems
 def problems_to_file(name, that):
     f= open(name,"w+")
     for elem in that:
