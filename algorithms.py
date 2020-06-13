@@ -66,16 +66,16 @@ def greedy4Coloring(problem):
         return True
 
 def round_eliminator_constant(problem):
-    iter_label = [(20,3),(8,4),(4,5),(4,6)]
+    iter_label = [(20,3),(9,4),(4,5),(4,6)]
     #for i in range(len(iter_label)):
-    for i in range(1):
-        ub = round_eliminator(problem,'autoub', iter_label[1][0], iter_label[1][1])
+    for i in [1,2]:
+        ub = round_eliminator(problem,'autoub', iter_label[i][0], iter_label[i][1])
         if ub >= 0:
             if i > 0:
                 print(" done in : ",i," with a ub of : ",ub)
             return ub
     return -1
-    
+
 def round_eliminator(problem, function, iterations, labels):
     with tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_w, tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_b:
         

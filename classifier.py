@@ -11,8 +11,7 @@ from bitarray import bitarray, util
 from two_labels_classifier import get_complexity_of,constraints_to_bitvector_tuple
 from input import ITERATED_LOGARITHMIC, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
 from problem_set import Problem_set
-WHITE_DEGREE = 2
-BLACK_DEGREE = 3
+
 LABELS = frozenset([0,1,2])
 
 # Classify the problems of the given set according to the given complexity
@@ -47,13 +46,13 @@ def unsolvable_criteria(problem):
 def two_labels_criteria(problem):
     # Problems that are 2 labelling problems
     if len(problem.alphabet()) < 3 and len(problem.white_constraint) > 0 and len(problem.black_constraint) > 0:
-        problem.set_complexity(get_complexity_of(*constraints_to_bitvector_tuple(problem.white_constraint,problem.black_constraint,problem.alphabet(),WHITE_DEGREE,BLACK_DEGREE)))
+        problem.set_complexity(get_complexity_of(*constraints_to_bitvector_tuple(problem.white_constraint,problem.black_constraint,problem.alphabet(),problem.white_degree,problem.black_degree)))
         return
     # Redundancy of a label
     if problem.alphabet_size() == 3:
         tmp = redundancy_algorithm(problem.white_constraint,problem.black_constraint)
         if tmp != None:
-            problem.set_complexity(get_complexity_of(*constraints_to_bitvector_tuple(tmp[0],tmp[1],tmp[2],WHITE_DEGREE,BLACK_DEGREE)))
+            problem.set_complexity(get_complexity_of(*constraints_to_bitvector_tuple(tmp[0],tmp[1],tmp[2],problem.white_degree,problem.black_degree)))
 
 def round_eliminator_ub_criteria(problem):
     upper_bound = round_eliminator_constant(problem)
@@ -169,13 +168,13 @@ def main(argv):
     print("Starting classification (" + str(len(problems)) + " problems)...")
     classify(problems,relaxations,restrictions)
 
-    store(WHITE_DEGREE,BLACK_DEGREE,(problems,relaxations,restrictions),Problem_set.Classified)
+    store(min_degree,max_degree,(problems,relaxations,restrictions),Problem_set.Classified)
 
     for complexity in Complexity:
         classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
         print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
         if s:
-            problems_to_file("output/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
+            problems_to_file("output/" + str(min_degree) + "_" + str(max_degree) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
 
 
 if __name__ == "__main__":
