@@ -100,7 +100,7 @@ def classify(problems,relaxations,restrictions):
 
     partially_classify(unsolvable_criteria)
     partially_classify_debug(two_labels_criteria)
-    #partially_classify(round_eliminator_ub_criteria)
+    partially_classify(round_eliminator_ub_criteria)
     #partially_classify(round_eliminator_lb_criteria)
     partially_classify_debug(greedy_4_coloring_test) #done
     partially_classify_debug(cover_map_test)
