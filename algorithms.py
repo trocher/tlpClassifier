@@ -83,10 +83,12 @@ def round_eliminator(problem, function, iterations, labels):
         else :
             def get_value(result):
                 for i in range(1000):
-                    search_string = 'Upper bound of ' + str(i)
+                    search_string = 'Upper bound of ' + str(i) + ' rounds.'
                     if result.find(search_string) != -1:
                         return i
-                    return -1
+                print("ERRORRRRRRR")
+                print(result)
+                return 444
             w = 444
             b = 444
             if result_w:
