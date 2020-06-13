@@ -174,7 +174,7 @@ def main(argv):
     for complexity in Complexity:
         classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
         print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
-        if store:
+        if s:
             problems_to_file("output/" + str(WHITE_DEGREE) + "_" + str(BLACK_DEGREE) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
 
 
