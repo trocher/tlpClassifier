@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import sys, getopt
-from problem import Problem,Constraints
+from problem import Problem,Constraints,alpha_to_problem
 from complexity import Complexity,complexity_name
 from tqdm import tqdm
 import pickle
@@ -100,20 +100,20 @@ def classify(problems,relaxations,restrictions):
 
     partially_classify(unsolvable_criteria)
     partially_classify_debug(two_labels_criteria)
-    partially_classify(round_eliminator_ub_criteria)
+    #partially_classify(round_eliminator_ub_criteria)
     #partially_classify(round_eliminator_lb_criteria)
     partially_classify_debug(greedy_4_coloring_test) #done
     partially_classify_debug(cover_map_test)
     partially_classify_debug(log_test_test)
     
     for problem in problems:
-        if any([problem == problem.alpha_to_problem(elem) for elem in LOGARITHMIC_UPPER_BOUND]):
+        if any([problem == alpha_to_problem(elem) for elem in LOGARITHMIC_UPPER_BOUND]):
             problem.set_upper_bound(Complexity.Logarithmic)
-        if any([problem == problem.alpha_to_problem(elem) for elem in LOGARITHMIC_TIGHT]):
+        if any([problem == alpha_to_problem(elem) for elem in LOGARITHMIC_TIGHT]):
             problem.set_complexity(Complexity.Logarithmic)
-        if any([problem == problem.alpha_to_problem(elem) for elem in LOGARITHMIC_LOWER_BOUND]):
+        if any([problem == alpha_to_problem(elem) for elem in LOGARITHMIC_LOWER_BOUND]):
             problem.set_lower_bound(Complexity.Logarithmic)
-        if any([problem == problem.alpha_to_problem(elem) for elem in ITERATED_LOGARITHMIC]):
+        if any([problem == alpha_to_problem(elem) for elem in ITERATED_LOGARITHMIC]):
             problem.set_complexity(Complexity.Iterated_Logarithmic)
 
 
