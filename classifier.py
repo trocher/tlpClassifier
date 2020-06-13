@@ -107,13 +107,13 @@ def classify(problems,relaxations,restrictions):
     partially_classify_debug(log_test_test)
     
     for problem in problems:
-        if any([problem == tools.alpha_to_problem(elem) for elem in LOGARITHMIC_UPPER_BOUND]):
+        if any([problem == problem.alpha_to_problem(elem) for elem in LOGARITHMIC_UPPER_BOUND]):
             problem.set_upper_bound(Complexity.Logarithmic)
-        if any([problem == tools.alpha_to_problem(elem) for elem in LOGARITHMIC_TIGHT]):
+        if any([problem == problem.alpha_to_problem(elem) for elem in LOGARITHMIC_TIGHT]):
             problem.set_complexity(Complexity.Logarithmic)
-        if any([problem == tools.alpha_to_problem(elem) for elem in LOGARITHMIC_LOWER_BOUND]):
+        if any([problem == problem.alpha_to_problem(elem) for elem in LOGARITHMIC_LOWER_BOUND]):
             problem.set_lower_bound(Complexity.Logarithmic)
-        if any([problem == tools.alpha_to_problem(elem) for elem in ITERATED_LOGARITHMIC]):
+        if any([problem == problem.alpha_to_problem(elem) for elem in ITERATED_LOGARITHMIC]):
             problem.set_complexity(Complexity.Iterated_Logarithmic)
 
 
