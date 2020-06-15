@@ -67,7 +67,7 @@ def greedy4Coloring(problem):
     if white == problem.white_constraint and black.issubset(problem.black_constraint) and len(problem.black_constraint) > 3:
         return True
 
-def round_eliminator(problem, function, iterations, labels):
+def round_eliminator(problem, function, iterations, labels, start, search_string):
     with tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_w, tempfile.NamedTemporaryFile(mode = 'w+',suffix='.txt',newline='\n') as temp_file_b:
         
         temp_file_b.write(problem.re_format_black())
@@ -82,40 +82,22 @@ def round_eliminator(problem, function, iterations, labels):
             return -1
         else :
             def get_value(result):
-                for i in range(1000):
-                    search_string = 'Upper bound of ' + str(i) + ' rounds.'
+                for i in range(start, 1000):
+                    search_string_i  = search_string + str(i)
                     if result.find(search_string) != -1:
                         return i
-                print("ERRORRRRRRR")
-                print(result)
-                return 444
-            w = 444
-            b = 444
+                return -1
+            w = -1
+            b = -1
             if result_w:
                 w = get_value(result_w)
             if result_b:
                 b = get_value(result_b)
+            if w == -1:
+                return b
+            if b == -1:
+                return w
             return min(w,b)
-
-def round_eliminator_lb(problem,iterations,labels):
-    file_name = str(hash(problem))
-    print(file_name)
-    result_b = subprocess.getoutput(SERVER_DIR + " " + function + ' -f ' + temp_file_b.name + ' --iter ' + str(iterations) +' --labels ' + str(labels))
-    result_w = subprocess.getoutput(SERVER_DIR + " " + function + ' -f ' + temp_file_w.name + ' --iter ' + str(iterations) +' --labels ' + str(labels))
-    if not result_b.stdout and not result_w.stdout:
-        return -1
-    else :
-        print(file_name)
-        print("===========================")
-        def get_lower_bound(result):
-            if "Lower bound of " + str(iterations+1)+" rounds." in result:
-                return True
-            return False
-
-        if get_lower_bound(result_w.stdout) or get_lower_bound(result_b.stdout):
-            problem.print_RE()
-            return True
-
 def cover_map_1(white_constraint,black_constraint):
     w = set([(w0-b0,w1-b1,w2-b2) for (w0,w1,w2) in black_constraint for (b0,b1,b2) in white_constraint if w0-b0 >= 0 and w1-b1 >=0 and w2-b2>=0])
     b = set([(w0a+w0b,w1a+w1b,w2a+w2b) for (w0a,w1a,w2a) in w for (w0b,w1b,w2b) in w if (w0a+w0b,w1a+w1b,w2a+w2b) in white_constraint])

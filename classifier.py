@@ -55,8 +55,12 @@ def two_labels_criteria(problem):
         if tmp != None:
             problem.set_complexity(get_complexity_of(*constraints_to_bitvector_tuple(tmp[0],tmp[1],tmp[2],problem.white_degree,problem.black_degree)))
 
-#def round_eliminator_lb_criteria(problem):
-#    lower_bound = round_eliminator_lb(problem, 15, 5)
+def round_eliminator_lb_finder(problem):
+    iterations = 20
+    labels = 6
+    lower_bound = round_eliminator(problem, 'autolb', iterations, labels, iterations+1, 'Lower bound of ')
+    if lower_bound >= 0:
+        print(problem)
 
 def greedy_4_coloring_test(problem):
     if greedy4Coloring(problem):
@@ -79,12 +83,12 @@ def classify(problems,relaxations,restrictions):
             function(problem)
 
     def partially_classify_RE():
-        iter_label = [(20,3),(10,4),(3,5)]
+        iter_label = [(20,3),(8,4),(10,4),(6,5)]
         for i in range(len(iter_label)):
             n = 0
             print("Running the round eliminator with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
             for problem in tqdm({x for x in problems if x.lower_bound == Complexity.Constant and x.constant_upper_bound > 200}):
-                ub = round_eliminator(problem,'autoub', iter_label[i][0], iter_label[i][1])
+                ub = round_eliminator(problem,'autoub', iter_label[i][0], iter_label[i][1], 0, 'Upper bound of ')
                 if ub >= 0:
                     problem.set_complexity(Complexity.Constant)
                     problem.constant_upper_bound = min(problem.constant_upper_bound,ub)
@@ -107,8 +111,6 @@ def classify(problems,relaxations,restrictions):
     partially_classify(cover_map_test)
     print("Running the algorithm for iterated logarithmic upper bounds using greedy 4 coloring")
     partially_classify(greedy_4_coloring_test)
-    #partially_classify(round_eliminator_lb_criteria)
-    
     for problem in problems:
         if any([problem == alpha_to_problem(elem) for elem in LOGARITHMIC_UPPER_BOUND]):
             problem.set_upper_bound(Complexity.Logarithmic)
@@ -122,7 +124,9 @@ def classify(problems,relaxations,restrictions):
     propagate(problems,restrictions,relaxations)
     partially_classify_RE()
     propagate(problems,restrictions,relaxations)
-
+    print("Finding potential logarithmic lowerbounds using the round eliminator")
+    partially_classify(round_eliminator_lb_finder)
+    
 def main(argv):
     white_degree = -1
     black_degree = -1
