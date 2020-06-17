@@ -142,7 +142,11 @@ class Problem:
         return self.get_characteristic_problem() == self
 
 # Return an instance of a problem given an problem in an alpha form
-def alpha_to_problem(alpha_problem):
-    white_degree = alpha_problem[2]
-    black_degree = alpha_problem[3]
-    return Problem(alpha_to_num_constraint(alpha_problem[0]),alpha_to_num_constraint(alpha_problem[1]),alpha_problem[2],alpha_problem[3]).get_characteristic_problem()
+def alpha_to_problem(white_constraint,black_constraint):
+    if len(white_constraint)==0 or len(black_constraint) == 0:
+        return
+    white_degree = len(list(white_constraint)[0])
+    black_degree = len(list(black_constraint)[0])
+    degrees = [(white_degree,white_constraint),(black_degree,black_constraint)]
+    degrees.sort(key=lambda tup: tup[0])
+    return Problem(alpha_to_num_constraint(degrees[0][1]),alpha_to_num_constraint(degrees[1][1]),degrees[0][0],degrees[1][0]).get_characteristic_problem()

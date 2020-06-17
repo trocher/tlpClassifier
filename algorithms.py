@@ -81,18 +81,18 @@ def round_eliminator(problem, function, iterations, labels, start, search_string
         if not result_b and not result_w:
             return -1
         else :
-            def get_value(result):
+            def get_value(result,start):
                 for i in range(start, 1000):
                     search_string_i  = search_string + str(i)
-                    if result.find(search_string) != -1:
+                    if result.find(search_string_i) != -1:
                         return i
                 return -1
             w = -1
             b = -1
             if result_w:
-                w = get_value(result_w)
+                w = get_value(result_w,start)
             if result_b:
-                b = get_value(result_b)
+                b = get_value(result_b,start)
             if w == -1:
                 return b
             if b == -1:

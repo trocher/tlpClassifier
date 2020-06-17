@@ -10,7 +10,9 @@ def data_name(white_degree,black_degree):
 
 def import_data_set(white_degree, black_degree,classified):
     problems = (set(), dict(), dict())
-    with open(data_name(white_degree,black_degree) + '_' + problem_set_name[classified], 'rb') as problem_file:
+    min_degree = min([white_degree,black_degree])
+    max_degree = max([white_degree,black_degree])
+    with open(data_name(min_degree,max_degree) + '_' + problem_set_name[classified], 'rb') as problem_file:
         problems = pickle.load(problem_file)
     return problems
 

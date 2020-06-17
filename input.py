@@ -4,155 +4,151 @@ BLACKDEGREE = 3
 ITERATED_LOGARITHMIC = [
     #MIS
     ({'BC', 'AA'},
-    {'AAB', 'ABB', 'CCC', 'BBB'},
-    2,3),
+    {'AAB', 'ABB', 'CCC', 'BBB'}),
     #MIS
     ({'AA', 'BC', 'AC'},
-    {'CCC','AAB'},
-    2,3),
+    {'CCC','AAB'}),
 
     ({'AA', 'BC', 'CC'},
-    {'AAC','BBB','ABB'},
-    2,3)
+    {'AAC','BBB','ABB'})
 ]
 
 LOGARITHMIC_TIGHT = [
 
     # 3 vertex coloring on latex
     ({'AB', 'AC', 'BC'},
-    {'AAA','BBB','CCC'},
-    2,3),
+    {'AAA','BBB','CCC'}),
 
     # 3 edge coloring on latex
-    ({'AA', 'BB', 'CC'},
-    {'ABC'},2,3),
+    ({'AA', 'BB', 'CC'},{'ABC'}),
+
 
     ({'AB','CC'},
-    {'AAA','BBB','AAC','BBC'},2,3)
+    {'AAA','BBB','AAC','BBC'})
 ]
 LOGARITHMIC_UPPER_BOUND = [
+
+# SOO done on latex
+    ({'AC', 'BC'},
+    {'ABC', 'BCC'}),
+
+# SOO done on latex
+    ({'AB','BC'},
+    {'AAB','BBC'}),
+
+# EO done on latex 1
+    ({'AC','BC'},
+    {'ABC','CCC'}),
+
+# EO done on latex 2
+    ({'AC','BC'},
+    {'AAA','BCC'}),
+
+# EO done on latex 2
+    ({'AC','BC'},
+    {'ABB','ACC'}),
+
+# EO done on latex 2
+    ({'AC','BC'},
+    {'ABB','BCC'}),
+
 
 #MISS 1
 
     ({'AB', 'CC'},
-    {'CCB', 'ACC'},
-    2,3),
+    {'CCB', 'ACC'}),
 
     #####
     ({'AB', 'CC'},
-    {'BCC', 'ABB'},
-    2,3),
+    {'BCC', 'ABB'}),
 
     ({'AB', 'CC'},
-    {'BCC', 'AAC'},
-    2,3),
-    
-# SOO done on latex
-    ({'AC', 'BC'},
-    {'ABC', 'BCC'},2,3),
-
-# SOO done on latex
-    ({'AB','BC'},
-    {'AAB','BBC'},2,3),
-
-# EO done on latex 1
-    ({'AC','BC'},
-    {'ABC','CCC'},2,3),
-
-# EO done on latex 2
-    ({'AC','BC'},
-    {'AAA','BCC'},2,3),
-
-# EO done on latex 2
-    ({'AC','BC'},
-    {'ABB','ACC'},2,3),
-
-# EO done on latex 2
-    ({'AC','BC'},
-    {'ABB','BCC'},2,3),
+    {'BCC', 'AAC'}),
 
 # R&C
     ({'AB','CC'},
-    {'ABC'},2,3),
+    {'ABC'}),
 
 # R&C
     ({'AB','CC'},
-    {'AAB','BBC'},2,3),
+    {'AAB','BBC'}),
 
 # R&C
     ({'AB','CC'},
-    {'AAC','BBC'},2,3),
+    {'AAC','BBC'}),
 
 # R&C
     ({'AB','CC'},
-    {'AAB','BCC'},2,3),
+    {'AAB','BCC'}),
 
 # R&C
     ({'AB','CC'},
-    {'BCC','AAA'},2,3),
+    {'BCC','AAA'}),
 
 # R&C
     ({'AB','CC'},
-    {'BBC','AAA'},2,3)
+    {'BBC','AAA'})
 
 ]
 
 LOGARITHMIC_LOWER_BOUND = [
+# Manually checked fixed points using RE
+
 # fixed point 1
     ({'AC', 'BB', 'CC', 'AA', 'BC'},
-    {'AAB','ABC','ABB'},2,3),
+    {'AAB','ABC','ABB'}),
 
 # fixed point 1
     ({'AC', 'AB', 'CC', 'BC'},
-    {'AAA','BBC','BBB','ABB'},2,3),
+    {'AAA','BBC','BBB','ABB'}),
 
 # fixed point 2
     ({'BB', 'CC', 'AA'},
-    {'BCC','BBC','AAC','AAB'},2,3),
+    {'BCC','BBC','AAC','AAB'}),
 
 # fixed point 2
     ({'BB', 'CC', 'AA'},
-    {'BCC','AAC','ABB'},2,3),
+    {'BCC','AAC','ABB'}),
 
 # fixed point 2
     ({'AB', 'CC'},
-    {'ABB','AAA','BBB','BCC','ACC'},2,3),
+    {'ABB','AAA','BBB','BCC','ACC'}),
     
 # fixed point 2
     ({'AB', 'CC'},
-    {'AAB','AAA','BBB','BCC','AAC'},2,3),
+    {'AAB','AAA','BBB','BCC','AAC'}),
 
 # fixed point 2
     ({'CC', 'BC', 'AA'},
-    {'BBC','AAB','BBB','AAC','BCC'},2,3),
+    {'BBC','AAB','BBB','AAC','BCC'}),
 
 # fixed point 2.5
     ({'AB', 'CC'},
-    {'AAC','BBC','BBB','ABB'},2,3),
+    {'AAC','BBC','BBB','ABB'}),
 
 # fixed point auto
     ({'AB', 'CC'},
-    {'BCC','AAC','ABB'},2,3),
+    {'BCC','AAC','ABB'}),
 
 # fixed point auto
     ({'AB', 'CC'},
-    {'BCC','AAA','ABC'},2,3),
+    {'BCC','AAA','ABC'}),
 
 # fixed point auto
     ({'AB', 'CC'},
-    {'BBC','AAA','ABC'},2,3),
-
-
-# fixed point auto
-    ({'AB', 'CC'},
-    {'BCC','BBC','AAA'},2,3),
+    {'BBC','AAA','ABC'}),
 
 
 # fixed point auto
     ({'AB', 'CC'},
-    {'AAA','BBB','ABC'},2,3),
+    {'BCC','BBC','AAA'}),
+
 
 # fixed point auto
     ({'AB', 'CC'},
-    {'BCC','BBC','AAA','ABC'},2,3)
+    {'AAA','BBB','ABC'}),
+
+# fixed point auto
+    ({'AB', 'CC'},
+    {'BCC','BBC','AAA','ABC'})
 ]

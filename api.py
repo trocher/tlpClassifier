@@ -6,14 +6,16 @@ from timeit import default_timer as timer
 from input import LOGARITHMIC_LOWER_BOUND
 from problem_set import Problem_set
 
-
 # Get the complexity of a problem
-def get_problem(alpha_problem, problems):
-    problem = alpha_to_problem(alpha_problem)
+def get_problem(white_constraint,black_constraint, problems):
+    problem = alpha_to_problem(white_constraint,black_constraint)
+    if problem is None:
+        print("error : The problem was incorrectly entered (empty configuration set)")
+        return
     for elem in problems:
         if problem == elem:
             return elem
-    print("error")
+    print("error : The problem was incorrectly entered (wrong degree or more than 3 labels)")
 
 # Get the relaxations of a given problem
 def get_relaxations_of(alpha_problem,problems,relaxations,restrictions):
@@ -52,12 +54,14 @@ def get_upper_bounds_constant_problems(problems):
             res[ub] = res.get(ub,0) + 1
     return res
 
-problems,relaxations,restrictions = import_data_set(2, 3,Problem_set.Classified)
+WHITE_DEGREE = 3
+BLACK_DEGREE = 2
 
-white_constraint = {'BC','AA'}
-black_constraint = {'AAC', 'BBB'}
-alpha_problem = (white_constraint,black_constraint,2,3)
+problems,relaxations,restrictions = import_data_set(WHITE_DEGREE, BLACK_DEGREE,Problem_set.Classified)
 
-print(get_problem(alpha_problem,problems))
+black_constraint = {'AB', 'BB'}
+white_constraint = {'ABB'}
 
-print(get_upper_bounds_constant_problems(problems))
+print(get_problem(black_constraint,white_constraint,problems))
+
+#print(get_upper_bounds_constant_problems(problems))
