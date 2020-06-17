@@ -72,7 +72,7 @@ def cover_map_test(problem):
     if cover_map_1(problem.white_constraint,problem.black_constraint):
         problem.set_lower_bound(Complexity.Iterated_Logarithmic)
     
-def classify(problems,relaxations,restrictions):
+def classify(problems,relaxations,restrictions, white_degree, black_degree):
     print("Starting classification (" + str(len(problems)) + " problems)...")
     
     def unclassified_problems(problems):
@@ -85,7 +85,7 @@ def classify(problems,relaxations,restrictions):
             function(problem)
 
     def partially_classify_RE():
-        iter_label = [(20,3),(8,4),(8,4)]
+        iter_label = [(20,3),(8,4),(8,4),(9,4)]
         for i in range(len(iter_label)):
             n = 0
             print("Running the round eliminator with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
@@ -109,19 +109,21 @@ def classify(problems,relaxations,restrictions):
     partially_classify(unsolvable_criteria)
     print("Running the binary labelling classifier on binary problems and redundant ternary problems")
     partially_classify(two_labels_criteria)
-    print("Running algorithm for iterated logarithmic lower bounds using cover map")
-    partially_classify(cover_map_test)
-    print("Running the algorithm for iterated logarithmic upper bounds using greedy 4 coloring")
-    partially_classify(greedy_4_coloring_test)
-    for problem in problems:
-        if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in LOGARITHMIC_UPPER_BOUND]):
-            problem.set_upper_bound(Complexity.Logarithmic)
-        if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in LOGARITHMIC_TIGHT]):
-            problem.set_complexity(Complexity.Logarithmic)
-        if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in LOGARITHMIC_LOWER_BOUND]):
-            problem.set_lower_bound(Complexity.Logarithmic)
-        if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in ITERATED_LOGARITHMIC]):
-            problem.set_complexity(Complexity.Iterated_Logarithmic)
+
+    if white_degree == 2 and black_degree == 3:
+        print("Running algorithm for iterated logarithmic lower bounds using cover map")
+        partially_classify(cover_map_test)
+        print("Running the algorithm for iterated logarithmic upper bounds using greedy 4 coloring")
+        partially_classify(greedy_4_coloring_test)
+        for problem in problems:
+            if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in LOGARITHMIC_UPPER_BOUND]):
+                problem.set_upper_bound(Complexity.Logarithmic)
+            if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in LOGARITHMIC_TIGHT]):
+                problem.set_complexity(Complexity.Logarithmic)
+            if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in LOGARITHMIC_LOWER_BOUND]):
+                problem.set_lower_bound(Complexity.Logarithmic)
+            if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in ITERATED_LOGARITHMIC]):
+                problem.set_complexity(Complexity.Iterated_Logarithmic)
     
     propagate(problems,restrictions,relaxations)
     partially_classify_RE()
@@ -168,7 +170,7 @@ def main(argv):
     max_degree = max([white_degree,black_degree])
 
     problems,relaxations,restrictions = import_data_set(min_degree,max_degree,Problem_set.Unclassified)
-    classify(problems,relaxations,restrictions)
+    classify(problems,relaxations,restrictions, min_degree, max_degree)
 
     store(min_degree,max_degree,(problems,relaxations,restrictions),Problem_set.Classified)
 
