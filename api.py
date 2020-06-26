@@ -64,4 +64,4 @@ white_constraint = {'ABB'}
 
 print(get_problem(black_constraint,white_constraint,problems))
 
-#print(get_upper_bounds_constant_problems(problems))
+print(get_upper_bounds_constant_problems(problems))

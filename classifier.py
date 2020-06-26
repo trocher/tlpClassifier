@@ -12,7 +12,7 @@ from bitarray import bitarray, util
 from two_labels_classifier import get_complexity_of,constraints_to_bitvector_tuple
 from input import ITERATED_LOGARITHMIC, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
 from problem_set import Problem_set
-
+from pathlib import Path
 LABELS = frozenset([0,1,2])
 
 def compute_relaxations(problems, that, complexity,relaxations):
@@ -85,7 +85,7 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
             function(problem)
 
     def partially_classify_RE():
-        iter_label = [(20,3),(8,4),(8,4),(9,4)]
+        iter_label = [(20,3),(8,4),(9,4)]
         for i in range(len(iter_label)):
             n = 0
             print("Running the round eliminator with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
@@ -128,8 +128,8 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
     propagate(problems,restrictions,relaxations)
     partially_classify_RE()
     propagate(problems,restrictions,relaxations)
-    #print("Finding potential logarithmic lowerbounds using the round eliminator")
-    #partially_classify(round_eliminator_lb_finder)
+    print("Finding potential logarithmic lowerbounds using the round eliminator")
+    partially_classify(round_eliminator_lb_finder)
     #print(all([round_eliminator_lb_finder(alpha_to_problem(problem[0],problem[1])) for problem in LOGARITHMIC_LOWER_BOUND]))
     
 def main(argv):
@@ -160,7 +160,6 @@ def main(argv):
                 sys.exit(1)
         elif opt in ("-s","--store"):
             s = True
-            print("aaa")
 
     if (white_degree <= 1 or black_degree <= 1):
         print("A degree must be superior or equal to 2")
@@ -178,6 +177,7 @@ def main(argv):
         classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
         print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
         if s:
+            Path("output/"+ str(min_degree) + "_" + str(max_degree)).mkdir(parents=True, exist_ok=True)
             problems_to_file("output/" + str(min_degree) + "_" + str(max_degree) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
 
 
