@@ -10,7 +10,7 @@ from algorithms import constraint_reduction,redundancy_algorithm, greedy4Colorin
 from file_help import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
 from two_labels_classifier import get_complexity_of,constraints_to_bitvector_tuple
-from input import ITERATED_LOGARITHMIC, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
+from input import ITERATED_LOGARITHMIC_TIGHT, ITERATED_LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_UPPER_BOUND, LOGARITHMIC_TIGHT, LOGARITHMIC_LOWER_BOUND
 from problem_set import Problem_set
 from pathlib import Path
 LABELS = frozenset([0,1,2])
@@ -122,8 +122,10 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
                 problem.set_complexity(Complexity.Logarithmic)
             if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in LOGARITHMIC_LOWER_BOUND]):
                 problem.set_lower_bound(Complexity.Logarithmic)
-            if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in ITERATED_LOGARITHMIC]):
+            if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in ITERATED_LOGARITHMIC_TIGHT]):
                 problem.set_complexity(Complexity.Iterated_Logarithmic)
+            if any([problem == alpha_to_problem(elem[0],elem[1]) for elem in ITERATED_LOGARITHMIC_UPPER_BOUND]):
+                problem.set_upper_bound(Complexity.Iterated_Logarithmic)
     
     propagate(problems,restrictions,relaxations)
     partially_classify_RE()

@@ -1,13 +1,14 @@
-WHITEDEGREE = 2
-BLACKDEGREE = 3
-
-ITERATED_LOGARITHMIC = [
+ITERATED_LOGARITHMIC_TIGHT = [
     #MIS
     ({'BC', 'AA'},
     {'AAB', 'ABB', 'CCC', 'BBB'}),
     #MIS
     ({'AA', 'BC', 'AC'},
-    {'CCC','AAB'}),
+    {'CCC','AAB'})
+]
+
+
+ITERATED_LOGARITHMIC_UPPER_BOUND = [
 
     ({'AA', 'BC', 'CC'},
     {'AAC','BBB','ABB'})
@@ -51,9 +52,6 @@ LOGARITHMIC_UPPER_BOUND = [
 # EO done on latex 2
     ({'AC','BC'},
     {'ABB','BCC'}),
-
-
-#MISS 1
 
     ({'AB', 'CC'},
     {'CCB', 'ACC'}),
