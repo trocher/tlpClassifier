@@ -106,7 +106,7 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
         for i in range(len(iter_label)):
             n = 0
             print("Running the round eliminator's auto lower bound feature with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
-            for problem in tqdm({x for x in problems if x.upper_bound == Complexity.Constant}):
+            for problem in tqdm({x for x in problems if x.upper_bound == Complexity.Constant and x.constant_lower_bound != x.constant_upper_bound}):
                 lb = round_eliminator(problem,'autolb', iter_label[i][0], iter_label[i][1], 0, 'Lower bound of ')
                 if lb >= 0:
                     problem.set_complexity(Complexity.Constant)

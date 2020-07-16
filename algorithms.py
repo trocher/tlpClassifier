@@ -97,7 +97,12 @@ def round_eliminator(problem, function, iterations, labels, start, search_string
                 return b
             if b == -1:
                 return w
-            return min(w,b)
+            if function == "autoub":
+                return min(w,b)
+            if function == "autolb":
+                return max(w,b)
+            print("error, unknown RE function")
+            return
 def cover_map_1(white_constraint,black_constraint):
     w = set([(w0-b0,w1-b1,w2-b2) for (w0,w1,w2) in black_constraint for (b0,b1,b2) in white_constraint if w0-b0 >= 0 and w1-b1 >=0 and w2-b2>=0])
     b = set([(w0a+w0b,w1a+w1b,w2a+w2b) for (w0a,w1a,w2a) in w for (w0b,w1b,w2b) in w if (w0a+w0b,w1a+w1b,w2a+w2b) in white_constraint])
