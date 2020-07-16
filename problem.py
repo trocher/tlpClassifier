@@ -4,7 +4,7 @@ import itertools
 from algorithms import constraint_reduction
 from tools import alpha_to_num_constraint,num_to_alpha_configuration
 LABELS = [0,1,2]
-
+import sys
 class Constraints(Enum):
     White = 0
     Black = 1 
@@ -18,7 +18,8 @@ class Problem:
         self.black_degree = black_degree
         self.lower_bound = Complexity.Constant
         self.upper_bound = Complexity.Unsolvable
-        self.constant_upper_bound = 1000
+        self.constant_upper_bound = sys.maxsize
+        self.constant_lower_bound = 0
     # The hash function for problems
     def __hash__(self):
         return hash((self.white_constraint,self.black_constraint))
@@ -37,6 +38,7 @@ class Problem:
         else :
             res = res + "Complexity : "+ complexity_name[self.lower_bound] + "\n"
         if(self.get_complexity() == Complexity.Constant):
+            res += str(self.constant_lower_bound) + " round(s) lower bound\n"
             return res + str(self.constant_upper_bound) + " round(s) upper bound\n"
         return res
 
@@ -46,7 +48,7 @@ class Problem:
         if self.get_complexity() == Complexity.Unclassified:
             return {"white constraint" : w, "black constraint" : b, "complexity lower bound" : complexity_name[self.lower_bound], "complexity upper bound" : complexity_name[self.upper_bound]}
         if self.get_complexity() == Complexity.Constant:
-            return {"white constraint" : w, "black constraint" : b, "complexity" : complexity_name[self.get_complexity()], "complexity upper bound" : self.constant_upper_bound}
+            return {"white constraint" : w, "black constraint" : b, "complexity" : complexity_name[self.get_complexity()], "complexity lower bound" : self.constant_lower_bound, "complexity upper bound" : self.constant_upper_bound}
         else:
             return {"white constraint" : w, "black constraint" : b, "complexity" : complexity_name[self.get_complexity()]}
 
@@ -93,6 +95,15 @@ class Problem:
     def alphabet_size(self):
         return len(self.alphabet())
     
+
+    # Check if the current problem is a restriction of the given problem
+    def is_restriction(self, other):
+        return self.white_constraint.issubset(other.white_constraint) and self.black_constraint.issubset(other.black_constraint)
+
+     # Check if the current problem is a relaxation of the given problem
+    def is_relaxation(self, other):
+        return other.is_restriction(self)
+
     # Set a lower bound for the complexity of the problem
     def set_lower_bound(self,complexity):
         if self.upper_bound.value < complexity.value:

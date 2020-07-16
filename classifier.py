@@ -27,6 +27,8 @@ def compute_restrictions(problems, that, complexity,restrictions):
     for problem in that:
         for restr in restrictions[problem]:
             restr.set_lower_bound(complexity)
+            if complexity == Complexity.Constant:
+                restr.constant_lower_bound = max(restr.constant_lower_bound,problem.constant_lower_bound)
 
 def propagate(problems,restrictions,relaxations):
     print("Propagating the lower and upper bounds")
@@ -85,23 +87,34 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
         for problem in tqdm(unclassified_problems(problems)):
             function(problem)
 
-    def partially_classify_RE():
+    def partially_classify_RE_ub():
         iter_label = [(20,3),(8,4),(9,4)]
         for i in range(len(iter_label)):
             n = 0
-            print("Running the round eliminator with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
-            for problem in tqdm({x for x in problems if x.lower_bound == Complexity.Constant and x.constant_upper_bound > 200}):
+            print("Running the round eliminator's auto upper bound feature with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
+            for problem in tqdm({x for x in problems if x.lower_bound == Complexity.Constant and x.constant_upper_bound == sys.maxsize}):
                 ub = round_eliminator(problem,'autoub', iter_label[i][0], iter_label[i][1], 0, 'Upper bound of ')
                 if ub >= 0:
                     problem.set_complexity(Complexity.Constant)
                     problem.constant_upper_bound = min(problem.constant_upper_bound,ub)
                     n+=1
-                    if i >= 5:
-                        print(problem)
-                        print("with a ub of : ",ub)
             print(n," problems classified as constant")
             propagate(problems,restrictions,relaxations)
     
+    def partially_classify_RE_lb():
+        iter_label = [(15,5)]
+        for i in range(len(iter_label)):
+            n = 0
+            print("Running the round eliminator's auto lower bound feature with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
+            for problem in tqdm({x for x in problems if x.upper_bound == Complexity.Constant}):
+                lb = round_eliminator(problem,'autolb', iter_label[i][0], iter_label[i][1], 0, 'Lower bound of ')
+                if lb >= 0:
+                    problem.set_complexity(Complexity.Constant)
+                    problem.constant_lower_bound = max(problem.constant_lower_bound,lb)
+                    n+=1
+            propagate(problems,restrictions,relaxations)
+    
+
     def partially_classify_debug(function):
         for problem in tqdm(solvable_problems(problems)):
             function(problem)
@@ -129,8 +142,8 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
                 problem.set_upper_bound(Complexity.Iterated_Logarithmic)
     
     propagate(problems,restrictions,relaxations)
-    #partially_classify_RE()
-    propagate(problems,restrictions,relaxations)
+    partially_classify_RE_ub()
+    partially_classify_RE_lb()
     print("Finding potential logarithmic lowerbounds using the round eliminator")
     #partially_classify(round_eliminator_lb_finder)
     #print(all([round_eliminator_lb_finder(alpha_to_problem(problem[0],problem[1])) for problem in LOGARITHMIC_LOWER_BOUND]))

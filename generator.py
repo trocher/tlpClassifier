@@ -33,7 +33,7 @@ def generate(white_degree, black_degree):
 
     relaxations_dict, restrictions_dict = dict(),dict()
 
-    for problem in problems:
+    for problem in tqdm(problems):
         a,b = process_problem(problem)
         relaxations_dict[problem] = a
         restrictions_dict[problem] = b
