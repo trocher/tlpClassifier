@@ -172,7 +172,7 @@ def main(argv):
     json_dict = dict()
     for complexity in Complexity:
         classifiedSubset = [x.to_tuple() for x in problems if x.get_complexity() == complexity]
-        print (complexity_name[complexity] + " : " + len(classifiedSubset), " problems")            
+        print (complexity_name[complexity] + " : " + str(len(classifiedSubset)), " problems")            
         json_dict[complexity_name[complexity]] = classifiedSubset
 
     with open("output/" + str(min_degree) + "_" + str(max_degree) + ".json", "w") as write_file:
