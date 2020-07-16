@@ -40,6 +40,17 @@ class Problem:
             return res + str(self.constant_upper_bound) + " round(s) upper bound\n"
         return res
 
+    def to_tuple(self):
+        w = ", ".join(map(num_to_alpha_configuration,self.white_constraint))
+        b = ", ".join(map(num_to_alpha_configuration,self.black_constraint))
+        if self.get_complexity() == Complexity.Unclassified:
+            return {"white constraint" : w, "black constraint" : b, "complexity lower bound" : complexity_name[self.lower_bound], "complexity upper bound" : complexity_name[self.upper_bound]}
+        if self.get_complexity() == Complexity.Constant:
+            return {"white constraint" : w, "black constraint" : b, "complexity" : complexity_name[self.get_complexity()], "complexity upper bound" : self.constant_upper_bound}
+        else:
+            return {"white constraint" : w, "black constraint" : b, "complexity" : complexity_name[self.get_complexity()]}
+
+
     # Write the main characteristics of the problem in a file
     def write_in_file(self, io):
         io.write(self.__repr__()+"\n")

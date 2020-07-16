@@ -53,13 +53,19 @@ LOGARITHMIC_UPPER_BOUND = [
     ({'AC','BC'},
     {'ABB','BCC'}),
 
+# color+edgecolor done on latex 2
+    ({'AC','BC','AB'},
+    {'ABC'}),
+
+# R&C
     ({'AB', 'CC'},
     {'CCB', 'ACC'}),
 
-    #####
-    ({'AB', 'CC'},
-    {'BCC', 'ABB'}),
+#    #####
+#    ({'AB', 'CC'},
+#    {'BCC', 'ABB'}),
 
+# R&C
     ({'AB', 'CC'},
     {'BCC', 'AAC'}),
 

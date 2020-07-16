@@ -3,6 +3,7 @@ import sys, getopt
 from problem import Problem,Constraints,alpha_to_problem
 from complexity import Complexity,complexity_name
 from tqdm import tqdm
+import json
 import pickle
 from time import time
 import tools
@@ -128,10 +129,10 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
                 problem.set_upper_bound(Complexity.Iterated_Logarithmic)
     
     propagate(problems,restrictions,relaxations)
-    partially_classify_RE()
+    #partially_classify_RE()
     propagate(problems,restrictions,relaxations)
     print("Finding potential logarithmic lowerbounds using the round eliminator")
-    partially_classify(round_eliminator_lb_finder)
+    #partially_classify(round_eliminator_lb_finder)
     #print(all([round_eliminator_lb_finder(alpha_to_problem(problem[0],problem[1])) for problem in LOGARITHMIC_LOWER_BOUND]))
     
 def main(argv):
@@ -139,14 +140,13 @@ def main(argv):
     black_degree = -1
     s = False
     try:
-        opts, args = getopt.getopt(argv,"hw:b:s",["wdegree=","bdegree=",'store'])
+        opts, args = getopt.getopt(argv,"hw:b:",["wdegree=","bdegree="])
     except getopt.GetoptError:
         print ('classifier.py -w <whitedegree> -b <blackdegree>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print('classifier.py -w <whitedegree> -b <blackdegree>')
-            print('-s to store the differents ')
             sys.exit()
         elif opt in ("-w", "--wdegree"):
             try :
@@ -160,8 +160,6 @@ def main(argv):
             except ValueError:
                 print("The black degree is not an int")
                 sys.exit(1)
-        elif opt in ("-s","--store"):
-            s = True
 
     if (white_degree <= 1 or black_degree <= 1):
         print("A degree must be superior or equal to 2")
@@ -175,13 +173,13 @@ def main(argv):
 
     store(min_degree,max_degree,(problems,relaxations,restrictions),Problem_set.Classified)
 
+    json_dict = dict()
     for complexity in Complexity:
-        classifiedSubset = {x for x in problems if x.get_complexity() == complexity}
-        print(complexity_name.get(complexity)+ " problems :",len(classifiedSubset))
-        if s:
-            Path("output/"+ str(min_degree) + "_" + str(max_degree)).mkdir(parents=True, exist_ok=True)
-            problems_to_file("output/" + str(min_degree) + "_" + str(max_degree) + "/" + complexity_name.get(complexity) + ".txt", classifiedSubset)
+        classifiedSubset = [x.to_tuple() for x in problems if x.get_complexity() == complexity]
+        json_dict[complexity_name[complexity]] = classifiedSubset
 
+    with open("output/" + str(min_degree) + "_" + str(max_degree) + ".json", "w") as write_file:
+        json.dump(json_dict,write_file,indent=4)
 
 if __name__ == "__main__":
    main(sys.argv[1:])

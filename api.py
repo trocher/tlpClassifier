@@ -58,9 +58,12 @@ WHITE_DEGREE = 3
 BLACK_DEGREE = 2
 
 problems,relaxations,restrictions = import_data_set(WHITE_DEGREE, BLACK_DEGREE,Problem_set.Classified)
-black_constraint = {'CC', 'BC', 'AA'}
-white_constraint = {'AAC', 'BBB', 'ABB'}
+black_constraint = {'AB'}
+white_constraint = {'ABB','AAB'}
 
 print(get_problem(black_constraint,white_constraint,problems))
 
-print(get_upper_bounds_constant_problems(problems))
+#print(get_upper_bounds_constant_problems(problems))
+
+#for elem in get_constant_problems_with_x_rounds_UB(9,problems):
+#    print(elem)
