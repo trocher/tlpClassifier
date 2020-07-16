@@ -7,7 +7,7 @@ import json
 import pickle
 from time import time
 import tools
-from algorithms import constraint_reduction,redundancy_algorithm, greedy4Coloring,cover_map_1, round_eliminator
+from algorithms import constraint_reduction,redundancy_algorithm, greedy4Coloring,cover_map_1, round_eliminator_lb, round_eliminator_ub
 from file_help import import_data_set, problems_to_file,add_degree_suffix,store
 from bitarray import bitarray, util
 from two_labels_classifier import get_complexity_of,constraints_to_bitvector_tuple
@@ -58,15 +58,6 @@ def two_labels_criteria(problem):
         if tmp != None:
             problem.set_complexity(get_complexity_of(*constraints_to_bitvector_tuple(tmp[0],tmp[1],tmp[2],problem.white_degree,problem.black_degree)))
 
-def round_eliminator_lb_finder(problem):
-    iterations = 17
-    labels = 5
-    lower_bound = round_eliminator(problem, 'autolb', iterations, labels, iterations+1, 'Lower bound of ')
-    if lower_bound >= 0:
-        print(problem.re_format_white())
-        return True
-    return False
-
 def greedy_4_coloring_test(problem):
     if greedy4Coloring(problem):
         problem.set_upper_bound(Complexity.Iterated_Logarithmic)
@@ -90,28 +81,24 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
     def partially_classify_RE_ub():
         iter_label = [(20,3),(8,4),(9,4)]
         for i in range(len(iter_label)):
-            n = 0
             print("Running the round eliminator's auto upper bound feature with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
             for problem in tqdm({x for x in problems if x.lower_bound == Complexity.Constant and x.constant_upper_bound == sys.maxsize}):
-                ub = round_eliminator(problem,'autoub', iter_label[i][0], iter_label[i][1], 0, 'Upper bound of ')
+                ub = round_eliminator_ub(problem, iter_label[i][0], iter_label[i][1])
                 if ub >= 0:
                     problem.set_complexity(Complexity.Constant)
                     problem.constant_upper_bound = min(problem.constant_upper_bound,ub)
-                    n+=1
             print(n," problems classified as constant")
             propagate(problems,restrictions,relaxations)
     
     def partially_classify_RE_lb():
-        iter_label = [(15,5)]
+        iter_label = [(15,5),(10,6)]
         for i in range(len(iter_label)):
-            n = 0
             print("Running the round eliminator's auto lower bound feature with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
             for problem in tqdm({x for x in problems if x.upper_bound == Complexity.Constant and x.constant_lower_bound != x.constant_upper_bound}):
-                lb = round_eliminator(problem,'autolb', iter_label[i][0], iter_label[i][1], 0, 'Lower bound of ')
+                lb = round_eliminator_lb(problem, iter_label[i][0], iter_label[i][1])
                 if lb >= 0:
                     problem.set_complexity(Complexity.Constant)
                     problem.constant_lower_bound = max(problem.constant_lower_bound,lb)
-                    n+=1
             propagate(problems,restrictions,relaxations)
     
 
@@ -144,10 +131,7 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
     propagate(problems,restrictions,relaxations)
     partially_classify_RE_ub()
     partially_classify_RE_lb()
-    print("Finding potential logarithmic lowerbounds using the round eliminator")
-    #partially_classify(round_eliminator_lb_finder)
-    #print(all([round_eliminator_lb_finder(alpha_to_problem(problem[0],problem[1])) for problem in LOGARITHMIC_LOWER_BOUND]))
-    
+
 def main(argv):
     white_degree = -1
     black_degree = -1
