@@ -90,7 +90,7 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
             propagate(problems,restrictions,relaxations)
     
     def partially_classify_RE_lb():
-        iter_label = [(15,5),(10,6)]
+        iter_label = [(15,5)]
         for i in range(len(iter_label)):
             print("Running the round eliminator's auto lower bound feature with the following parameters : iterations = " + str(iter_label[i][0]) + ", labels = " + str(iter_label[i][1]))
             for problem in tqdm({x for x in problems if x.upper_bound == Complexity.Constant and x.constant_lower_bound != x.constant_upper_bound}):
