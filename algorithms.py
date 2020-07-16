@@ -85,7 +85,7 @@ def round_eliminator_ub(problem, iterations, labels):
     if not result_b and not result_w:
         return -1
         
-    def get_value(result,start):
+    def get_value(result):
         for i in range(1000):
             search_string_i  = 'Upper bound of ' + str(i)
             if result.find(search_string_i) != -1:
