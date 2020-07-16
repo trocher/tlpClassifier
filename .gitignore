@@ -5,7 +5,6 @@ t.py
 .vscode/
 .DS_Store
 *.pyc
-output/
 Graph.py
 ttt.py
 server
