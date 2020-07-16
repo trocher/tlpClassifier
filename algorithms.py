@@ -111,9 +111,12 @@ def round_eliminator_lb(problem, iterations, labels):
             if result.find(search_string_i) != -1:
                 return i
         return -1
-        
     w = get_value(result_w) if result_w else -1
     b = get_value(result_b) if result_b else -1
+    if w > problem.constant_upper_bound:
+        return b
+    if b > problem.constant_upper_bound:
+        return w
     return max(w,b)
 
 def cover_map_1(white_constraint,black_constraint):
