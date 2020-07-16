@@ -87,7 +87,6 @@ def classify(problems,relaxations,restrictions, white_degree, black_degree):
                 if ub >= 0:
                     problem.set_complexity(Complexity.Constant)
                     problem.constant_upper_bound = min(problem.constant_upper_bound,ub)
-            print(n," problems classified as constant")
             propagate(problems,restrictions,relaxations)
     
     def partially_classify_RE_lb():
