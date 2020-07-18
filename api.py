@@ -58,8 +58,8 @@ WHITE_DEGREE = 3
 BLACK_DEGREE = 2
 
 problems,relaxations,restrictions = import_data_set(WHITE_DEGREE, BLACK_DEGREE,Problem_set.Classified)
-black_constraint = {'AB'}
-white_constraint = {'ABB','AAB'}
+black_constraint = {'BC','AA'}
+white_constraint = {'AAC', 'BBB'}
 
 print(get_problem(black_constraint,white_constraint,problems))
 
